@@ -1,0 +1,24 @@
+#define AF_USART1_TX 7
+#define AF_USART1_RX 7
+#define AF_USART2_TX 7
+#define AF_USART2_RX 7
+#define AF_USART3_TX 7
+#define AF_USART3_RX 7
+#define AF_UART4_TX 8
+#define AF_UART4_RX 8
+#define AF_UART5_TX 8
+#define AF_UART5_RX 8
+#define AF_USART6_TX 8
+#define AF_USART6_RX 8
+
+#define AF_TIM1 1
+#define AF_TIM2 1
+#define AF_TIM3 2
+#define AF_TIM4 2
+#define AF_TIM5 2
+#define AF_TIM9 3
+#define AF_TIM10 3
+#define AF_TIM11 3
+#define AF_TIM12 9
+#define AF_TIM13 9
+#define AF_TIM14 9
