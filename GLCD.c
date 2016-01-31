@@ -441,20 +441,24 @@ unsigned short PrintValueOf3GLCD(unsigned int val, unsigned short xpos, unsigned
 	unsigned int digitval;
 	unsigned int print;
 
-	unit=1000000000;
-	print=0;
+	unit = 1000000000;
+	print = 0;
 
 	for(digit=10;digit>=1;digit--)
 	{
-		digitval=val/unit;
+		digitval = val/unit;
 		val -= digitval*unit;
-		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ xpos=PrintCharGLCD(digitval+'0', xpos ,ypos, colour); }
+		if ((digitval > 0) || (digit==1)) print = 1;
+		if (print == 1) {
+			xpos = PrintCharGLCD(digitval + '0', xpos ,ypos, colour);
+			if ((digit % 3) == 1) xpos += 4;
+		}
 		unit /= 10;
 	}
 
 	return xpos;
 }
+
 
 
 
