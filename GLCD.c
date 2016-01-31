@@ -446,11 +446,11 @@ unsigned short PrintValueOf3GLCD(unsigned int val, unsigned short xpos, unsigned
 
 	for(digit=10;digit>=1;digit--)
 	{
-		digitval = val/unit;
-		val -= digitval*unit;
+		digitval = val / unit;
+		val -= digitval * unit;
 		if ((digitval > 0) || (digit==1)) print = 1;
 		if (print == 1) {
-			xpos = PrintCharGLCD(digitval + '0', xpos ,ypos, colour);
+			xpos = PrintCharGLCD(digitval + '0', xpos, ypos, colour);
 			if ((digit % 3) == 1) xpos += 4;
 		}
 		unit /= 10;
