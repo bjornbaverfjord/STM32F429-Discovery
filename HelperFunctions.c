@@ -531,8 +531,8 @@ void FailWith(char string[],int e) {
 	ClearGLCD(LCD_COLOR_BLUE);
 	PrintStringGLCD(string, 10, 10, LCD_COLOR_WHITE);
 	PrintValueGLCD(e, 10, 30, LCD_COLOR_YELLOW);
-	PrintHexGLCD(e, 10, 50, LCD_COLOR_YELLOW);
-	PrintBinOf8GLCD(e, 10, 70, LCD_COLOR_YELLOW);
+	PrintHexOf2GLCD(e, 10, 50, LCD_COLOR_YELLOW);
+	PrintBinOf4GLCD(e, 10, 70, LCD_COLOR_YELLOW);
 	while(1)
 	{
 		if ((x & 15) == 0) { 

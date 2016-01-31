@@ -419,6 +419,28 @@ unsigned short PrintValueGLCD(unsigned int val, unsigned short xpos, unsigned sh
 	unsigned int digitval;
 	unsigned int print;
 
+	unit = 1000000000;
+	print = 0;
+
+	for(digit=10;digit>=1;digit--)
+	{
+		digitval = val/unit;
+		val -= digitval*unit;
+		if ((digitval > 0) || (digit==1)) print = 1;
+		if (print == 1) xpos = PrintCharGLCD(digitval + '0', xpos ,ypos, colour);
+		unit /= 10;
+	}
+
+	return xpos;
+}
+
+unsigned short PrintValueOf3GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
+{
+	unsigned int unit;
+	unsigned int digit;
+	unsigned int digitval;
+	unsigned int print;
+
 	unit=1000000000;
 	print=0;
 
@@ -433,6 +455,7 @@ unsigned short PrintValueGLCD(unsigned int val, unsigned short xpos, unsigned sh
 
 	return xpos;
 }
+
 
 
 unsigned short PrintValue2DigitsGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
@@ -485,6 +508,25 @@ unsigned short PrintHexGLCD(unsigned int val, unsigned short xpos, unsigned shor
 	return xpos;
 }
 
+// Print hex in groups of 2 digits
+unsigned short PrintHexOf2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
+{
+	int i;
+	
+	xpos = PrintCharGLCD('0', xpos, ypos, colour);
+	xpos = PrintCharGLCD('x', xpos, ypos, colour);
+	xpos += 4;
+	
+	for(i=28;i>=0;i-=4)
+	{
+		xpos=PrintCharGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, colour);
+		if ((i & 7) == 0) xpos += 4;
+	}
+
+	return xpos;
+}
+
+
 unsigned short PrintHexByteGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
 {
 	int i;
@@ -509,7 +551,8 @@ unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned shor
 	return xpos;
 }
 
-unsigned short PrintBinOf8GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
+// Print int as binary in groups of 4 digits
+unsigned short PrintBinOf4GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
 {
 	int i;
 	for(i=31;i>=0;i--)
