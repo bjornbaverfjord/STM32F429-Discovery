@@ -46,7 +46,7 @@ int main(void)
 	
 	// Mix layer1 and layer2 equally
 	SetTrasparencyGraphics(128);
-	
+	FailWith("failure",1103);
   x = 0;
   while(1)
 	{

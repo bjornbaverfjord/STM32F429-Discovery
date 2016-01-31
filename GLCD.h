@@ -141,6 +141,7 @@ unsigned short PrintFloatGLCD(double val, unsigned int decimals, unsigned short 
 unsigned short PrintHexGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a 32 bit variable as hex)
 unsigned short PrintHexByteGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a byte variable as hex)
 unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a variable as binary)
+unsigned short PrintBinOf8GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a variable as binary)
 unsigned short GetStringWidthGLCD(char string[]);													//given a string, returns the number of pixels in width (without the ending space)
 
 unsigned short PrintCharWithBGGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//char, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a character with its top left at x,y)

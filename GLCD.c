@@ -509,6 +509,18 @@ unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned shor
 	return xpos;
 }
 
+unsigned short PrintBinOf8GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
+{
+	int i;
+	for(i=31;i>=0;i--)
+	{
+		if(((val>>i) & 1)==1){ xpos=PrintCharGLCD('1', xpos, ypos, colour); }else{ xpos=PrintCharGLCD('0', xpos, ypos, colour); }
+		if ((i & 3) == 0)  xpos += 4;
+	}
+
+	return xpos;
+}
+
 
 unsigned short PrintCharWithBGGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
 {
