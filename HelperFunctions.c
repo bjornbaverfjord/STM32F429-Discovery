@@ -123,6 +123,11 @@ void printf6(const char * format, ... )
 	va_end(args);
 }
 
+// Check if int is a power of two (contains a single 1)
+int isPow2 (int x) {
+	return ((x != 0) && !(x & (x - 1)));
+}
+
 // Absolute value of an int
 int iabs(int n) {
 	if (n >= 0 ) return n;
