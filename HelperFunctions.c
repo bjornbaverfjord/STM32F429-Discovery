@@ -196,8 +196,10 @@ unsigned int cmpstr(char str1[], char str2[])
 }
 
 // Fast pseudorandom integer
+// Do not change the seed without extremely good reason
+// The seed 0xfb000 is carefully selected to load in one ARM instruction, giving a period of 1 703 271
 int rnd(void) {
-	static unsigned int r = 93262385;
+	static unsigned int r = 0xfb000;
 	return r = (((r >> 21) | (r << (32 - 21))) - r);
 }
 
