@@ -124,7 +124,7 @@ void printf6(const char * format, ... )
 }
 
 // Check if int is a power of two (contains a single 1)
-int isPow2 (int x) {
+int IsPow2 (int x) {
 	return ((x != 0) && !(x & (x - 1)));
 }
 
@@ -211,32 +211,32 @@ int RandInt(int min, int max)
 
 int average(int data[], unsigned length)
 {
-	int total=0;
-	unsigned int i;
+  int total=0;
+  unsigned int i;
     
-    if (length ==0) return 0;
-    for(i=0;i<length;i++){ total += data[i]; }
-	return total/length;
+  if (length == 0) return 0;
+  for(i=0;i<length;i++){ total += data[i]; }
+  return total/length;
 }
 
 int median(int data[], unsigned int length)
 {
 	int median;
 
-    if (length ==0) return 0;
+  if (length == 0) return 0;
 	sort(data, length, 0);
 	median=data[length>>1];
 	if((length & 1)==0){ median+=data[(length>>1)-1]; median>>=1; }
 	
-    return median;
+  return median;
 }
 
 
-// Modified bubble sort, uses no extra memory and is fast on almost all input data
+// Combsort11, uses no extra memory and is fast on almost all input data
 void sort(int data[], unsigned int length, int dir) {
 	unsigned int i, gap,f;
     
-    if (length ==0) return;
+  if (length ==0) return;
 	if (dir) dir = -1;
 
 	gap = length;
