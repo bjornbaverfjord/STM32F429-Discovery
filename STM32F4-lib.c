@@ -953,12 +953,47 @@ void PrintfUSART(volatile unsigned int *USART_SR, volatile unsigned int *USART_D
 	va_end(args);
 }
 
-//void Printf1(const char * format, ... ){ PrintfUSART((unsigned int *)&USART1_SR, (unsigned int *)&USART1_DR, * format, ... ); }
-//void Printf2(const char * format, ... ){ PrintfUSART((unsigned int *)&USART2_SR, (unsigned int *)&USART2_DR, * format, ... ); }
-//void Printf3(const char * format, ... ){ PrintfUSART((unsigned int *)&USART3_SR, (unsigned int *)&USART3_DR, * format, ... ); }
-//void Printf4(const char * format, ... ){ PrintfUSART((unsigned int *)&UART4_SR, (unsigned int *)&UART4_DR, * format, ... ); }
-//void Printf5(const char * format, ... ){ PrintfUSART((unsigned int *)&UART5_SR, (unsigned int *)&UART5_DR, * format, ... ); }
-//void Printf6(const char * format, ... ){ PrintfUSART((unsigned int *)&USART6_SR, (unsigned int *)&USART6_DR, * format, ... ); }
+void Printf1(const char * format, ... )
+{
+	va_list args;
+	va_start(args,format);
+	PrintfUSART((unsigned int *)&USART1_SR, (unsigned int *)&USART1_DR, format, args );
+}
+
+void Printf2(const char * format, ... )
+{
+	va_list args;
+	va_start(args,format);
+	PrintfUSART((unsigned int *)&USART2_SR, (unsigned int *)&USART2_DR, format, args );
+}
+
+void Printf3(const char * format, ... )
+{
+	va_list args;
+	va_start(args,format);
+	PrintfUSART((unsigned int *)&USART3_SR, (unsigned int *)&USART3_DR, format, args );
+}
+
+void Printf4(const char * format, ... )
+{
+	va_list args;
+	va_start(args,format);
+	PrintfUSART((unsigned int *)&UART4_SR, (unsigned int *)&UART4_DR, format, args );
+}
+
+void Printf5(const char * format, ... )
+{
+	va_list args;
+	va_start(args,format);
+	PrintfUSART((unsigned int *)&UART5_SR, (unsigned int *)&UART5_DR, format, args );
+}
+
+void Printf6(const char * format, ... )
+{
+	va_list args;
+	va_start(args,format);
+	PrintfUSART((unsigned int *)&USART6_SR, (unsigned int *)&USART6_DR, format, args );
+}
 
 void InitRandomNumberGenerator(void)
 {
