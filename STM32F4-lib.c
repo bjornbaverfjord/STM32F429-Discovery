@@ -935,6 +935,31 @@ unsigned int USART6DataIsAvailable(void)	// Return 1 if a character is in the bu
 	return USARTDataIsAvailable((unsigned int *)&USART6_SR);
 }
 
+void PrintfUSART(volatile unsigned int *USART_SR, volatile unsigned int *USART_DR, const char * format, ... )
+{
+	char buff[256];
+	unsigned int i=0;
+	va_list args;
+	
+	va_start(args,format);
+	vsnprintf(buff,256,format,args);
+	
+  //print the string
+	do
+	{
+		WriteUSART(buff[i], (unsigned int *)&USART_SR, (unsigned int *)&USART_DR);
+	}while(buff[i]!=0);
+	
+	va_end(args);
+}
+
+//void Printf1(const char * format, ... ){ PrintfUSART((unsigned int *)&USART1_SR, (unsigned int *)&USART1_DR, * format, ... ); }
+//void Printf2(const char * format, ... ){ PrintfUSART((unsigned int *)&USART2_SR, (unsigned int *)&USART2_DR, * format, ... ); }
+//void Printf3(const char * format, ... ){ PrintfUSART((unsigned int *)&USART3_SR, (unsigned int *)&USART3_DR, * format, ... ); }
+//void Printf4(const char * format, ... ){ PrintfUSART((unsigned int *)&UART4_SR, (unsigned int *)&UART4_DR, * format, ... ); }
+//void Printf5(const char * format, ... ){ PrintfUSART((unsigned int *)&UART5_SR, (unsigned int *)&UART5_DR, * format, ... ); }
+//void Printf6(const char * format, ... ){ PrintfUSART((unsigned int *)&USART6_SR, (unsigned int *)&USART6_DR, * format, ... ); }
+
 void InitRandomNumberGenerator(void)
 {
 	RCC_AHB2ENR |= 1UL<<6;	//Random number generator clock enable

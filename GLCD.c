@@ -4,6 +4,7 @@
 #include "registers.h"
 #include <limits.h>
 #include "STM32F4-lib.h"
+#include <stdarg.h>
 
 struct GraphicsType Graphics;
 
@@ -2363,5 +2364,60 @@ int RGB888OfRGB565(int c) {
 	b = (b << 3) | (b >> 2); 
 	
 	return (r << 16) | (g << 8) | b;
+}
+
+unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, unsigned int colour)
+{
+	int x;
+	int y;
+	int bytenum;
+
+	if(font==LCDFontVariableWidth)
+	{
+		x=0;
+		for(bytenum=ascii2[character-' '];bytenum<(ascii2[character-' ']+ascii2[95+(character-' ')]);bytenum++)
+		{
+			for(y=0;y<8;y++)	//add byte
+			{
+				if(((ascii2[bytenum]>>y) & 1)==1){ SetPixelGLCD(x+x1,y+y1,colour); }
+			}
+			x+=1;
+		}
+	}
+	
+	if(font==LCDFont7x11)
+	{
+		for(x=0;x<7;x++)
+		{
+			for(y=5;y<16;y++)
+			{
+				if((ascii_7x11[character-0x20][x]>>y) & 1)
+				{
+					SetPixelGLCD(x+x1,y+y1-5,colour);
+				}
+			}
+		}
+	}
+	
+	return x1+x+1;
+}
+
+void PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
+{
+	char buff[256];
+	unsigned int i=0;
+	va_list args;
+	
+	va_start(args,format);
+	vsnprintf(buff,256,format,args);
+	
+  //print the string
+	do
+	{
+		x1=BmpCharacter(buff[i], x1, y1, font, colour);
+		i+=1;
+	}while(buff[i]!=0);
+	
+	va_end(args);
 }
 

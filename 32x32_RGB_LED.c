@@ -2005,7 +2005,7 @@ unsigned int PrintValue2DigitsSevSegLarge(unsigned int bitmap[][32], unsigned in
 	return xpos;
 }
 
-void printfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
+void PrintfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
 {
 	char buff[256];
 	unsigned int i=0;

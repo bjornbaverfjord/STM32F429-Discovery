@@ -10,6 +10,10 @@
 #define ClearBufferAfterFlip 2
 #define WaitForVerticalSync 4
 
+//fonts
+#define LCDFontVariableWidth 0
+#define LCDFont7x11 1
+
 
 /*
 colours
@@ -128,6 +132,11 @@ void WaitForVSyncStart(void);
 void WaitForVSyncGLCD(void);
 void WaitForHSyncGLCD(void);
 void TranslateXYGLCD(int *x, int *y);
+
+//text
+//available fonts: LCDFontVariableWidth, LCDFont7x11
+unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, unsigned int colour);
+void PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );
 
 
 //7x11 font functions

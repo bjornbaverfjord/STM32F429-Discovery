@@ -186,7 +186,7 @@ void BmpScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32]
 
 void BmpShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xRight, int yTop, unsigned int endgap, unsigned int fps, unsigned int DisplayMode);
 
-void printfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );	//font must be LedFontVariableWidth or LedFont7x11
+void PrintfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );	//font must be LedFontVariableWidth or LedFont7x11
 
 void BmpSevSegDigit(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int colour);
 unsigned int BmpSevSegSegMultiDigits(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int ForceDigits, unsigned int colour);	//returns x position for next character. if ForceDigits= 0 or 1 then it will use as many digits as needed, 2 or more will left append 0s if needed

@@ -1,3 +1,6 @@
+#include <stdarg.h>
+#include <stdio.h>
+
 //this contains STM32F4 hardware functions only
 //for helper functions such as printf or math functions, see HelperFunctions.h
 //for functions that use the external onboard hardware, see DiscoveryFunctions.h
@@ -309,6 +312,14 @@ void InitUSART(unsigned int baud, volatile unsigned int *USART_BRR, volatile uns
 void WriteUSART(unsigned char chrval, volatile unsigned int *USART_SR, volatile unsigned int *USART_DR);
 unsigned char ReadUSART(volatile unsigned int *USART_SR, volatile unsigned int *USART_DR);
 unsigned int USARTDataIsAvailable(volatile unsigned int *USART_SR);	// Return 1 if a byte is in the buffer
+
+void PrintfUSART(volatile unsigned int *USART_SR, volatile unsigned int *USART_DR, const char * format, ... );
+void Printf1(const char * format, ... );
+void Printf2(const char * format, ... );
+void Printf3(const char * format, ... );
+void Printf4(const char * format, ... );
+void Printf5(const char * format, ... );
+void Printf6(const char * format, ... );
 
 //RANDOM NUMBER GENERATOR---------------------------------------------------------------
 void InitRandomNumberGenerator(void);
