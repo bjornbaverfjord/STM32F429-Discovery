@@ -948,6 +948,7 @@ void PrintfUSART(volatile unsigned int *USART_SR, volatile unsigned int *USART_D
 	do
 	{
 		WriteUSART(buff[i], (unsigned int *)&USART_SR, (unsigned int *)&USART_DR);
+		i+=i;
 	}while(buff[i]!=0);
 	
 	va_end(args);
