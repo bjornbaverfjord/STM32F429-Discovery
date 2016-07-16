@@ -12,7 +12,9 @@ double ToDeg(double angle);
 double ToRad(double angle);
 
 int imap(int value, int fromLow, int fromHigh, int toLow, int toHigh);
+double fmap(double value, double fromLow, double fromHigh, double toLow, double toHigh);
 int iconstrain(int value, int min, int max);
+double fconstrain(double value, double min, double max);
 int imin(int value, int min);
 int imax(int value, int max);
 

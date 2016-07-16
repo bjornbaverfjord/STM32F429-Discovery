@@ -1,14 +1,13 @@
-#include "GLCD.h"
 #include "HelperFunctions.h"
-#include "STM32F4-lib.h"
+#include "STM32-lib.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
 #include <stdlib.h>
-#include "registers.h" // This line must be last or weird things happen
 
 #define PI 3.1415926535897932384626433832795
 
+/*
 void printf1(const char * format, ... )
 {
 	char buff[256];
@@ -21,12 +20,13 @@ void printf1(const char * format, ... )
   //print the string
 	do
 	{
-		WriteUSART1(buff[i]);
+		WriteLPUART1(buff[i]);
 		i+=1;
 	}while(buff[i]!=0);
 	
 	va_end(args);
 }
+*/
 
 void printf2(const char * format, ... )
 {
@@ -41,82 +41,6 @@ void printf2(const char * format, ... )
 	do
 	{
 		WriteUSART2(buff[i]);
-		i+=1;
-	}while(buff[i]!=0);
-	
-	va_end(args);
-}
-
-void printf3(const char * format, ... )
-{
-	char buff[256];
-	unsigned int i=0;
-	va_list args;
-	
-	va_start(args,format);
-	vsnprintf(buff,256,format,args);
-	
-  //print the string
-	do
-	{
-		WriteUSART3(buff[i]);
-		i+=1;
-	}while(buff[i]!=0);
-	
-	va_end(args);
-}
-
-void printf4(const char * format, ... )
-{
-	char buff[256];
-	unsigned int i=0;
-	va_list args;
-	
-	va_start(args,format);
-	vsnprintf(buff,256,format,args);
-	
-  //print the string
-	do
-	{
-		WriteUART4(buff[i]);
-		i+=1;
-	}while(buff[i]!=0);
-	
-	va_end(args);
-}
-
-void printf5(const char * format, ... )
-{
-	char buff[256];
-	unsigned int i=0;
-	va_list args;
-	
-	va_start(args,format);
-	vsnprintf(buff,256,format,args);
-	
-  //print the string
-	do
-	{
-		WriteUART5(buff[i]);
-		i+=1;
-	}while(buff[i]!=0);
-	
-	va_end(args);
-}
-
-void printf6(const char * format, ... )
-{
-	char buff[256];
-	unsigned int i=0;
-	va_list args;
-	
-	va_start(args,format);
-	vsnprintf(buff,256,format,args);
-	
-  //print the string
-	do
-	{
-		WriteUSART6(buff[i]);
 		i+=1;
 	}while(buff[i]!=0);
 	
@@ -159,7 +83,25 @@ int imap(int value, int fromLow, int fromHigh, int toLow, int toHigh)
 	return toLow+(int)((double)range*ratio);
 }
 
+double fmap(double value, double fromLow, double fromHigh, double toLow, double toHigh)
+{
+	double ratio;
+	double range=toHigh-toLow;
+	
+	ratio=(value-fromLow)/(fromHigh-fromLow);
+	
+	return toLow+(range*ratio);
+}
+
 int iconstrain(int value, int min, int max)
+{
+	if(value<min){ value=min; }
+	if(value>max){ value=max; }
+	
+	return value;
+}
+
+double fconstrain(double value, double min, double max)
 {
 	if(value<min){ value=min; }
 	if(value>max){ value=max; }
@@ -528,25 +470,7 @@ int lo8(int n)
 
 // Signal fatal error
 // TODO: Add rs-232 and other outputs
-void FailWith(char string[],int e) {
-	int x = 0;
-  configSYSTICK(1000);	//1us timer resolution
-  InitGLCD(landscape);
-	InitGraphics(1,1);
-  ConfigPortG("-o-- ----  ---- ----");
-
-	ClearGLCD(LCD_COLOR_BLUE);
-	PrintStringGLCD(string, 10, 10, LCD_COLOR_WHITE);
-	PrintValueOf3GLCD(e, 10, 30, LCD_COLOR_YELLOW);
-	PrintHexOf2GLCD(e, 10, 50, LCD_COLOR_YELLOW);
-	PrintBinOf4GLCD(e, 10, 70, LCD_COLOR_YELLOW);
-	while(1)
-	{
-		if ((x & 15) == 0) { 
-			GPIOG_ODR ^= 1 << 14;
-		}
-		x += 1;
-		waitsys(3300);
-	}
+void FailWith(char string[],int e)
+{
 }
 
