@@ -1,5 +1,5 @@
 #include "HelperFunctions.h"
-#include "STM32-lib.h"
+#include "STM32F4-lib.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
@@ -7,7 +7,6 @@
 
 #define PI 3.1415926535897932384626433832795
 
-/*
 void printf1(const char * format, ... )
 {
 	char buff[256];
@@ -20,13 +19,12 @@ void printf1(const char * format, ... )
   //print the string
 	do
 	{
-		WriteLPUART1(buff[i]);
+		WriteUSART1(buff[i]);
 		i+=1;
 	}while(buff[i]!=0);
 	
 	va_end(args);
 }
-*/
 
 void printf2(const char * format, ... )
 {
