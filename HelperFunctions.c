@@ -45,6 +45,82 @@ void printf2(const char * format, ... )
 	va_end(args);
 }
 
+void printf3(const char * format, ... )
+{
+	char buff[256];
+	unsigned int i=0;
+	va_list args;
+	
+	va_start(args,format);
+	vsnprintf(buff,256,format,args);
+	
+  //print the string
+	do
+	{
+		WriteUSART3(buff[i]);
+		i+=1;
+	}while(buff[i]!=0);
+	
+	va_end(args);
+}
+
+void printf4(const char * format, ... )
+{
+	char buff[256];
+	unsigned int i=0;
+	va_list args;
+	
+	va_start(args,format);
+	vsnprintf(buff,256,format,args);
+	
+  //print the string
+	do
+	{
+		WriteUART4(buff[i]);
+		i+=1;
+	}while(buff[i]!=0);
+	
+	va_end(args);
+}
+
+void printf5(const char * format, ... )
+{
+	char buff[256];
+	unsigned int i=0;
+	va_list args;
+	
+	va_start(args,format);
+	vsnprintf(buff,256,format,args);
+	
+  //print the string
+	do
+	{
+		WriteUART5(buff[i]);
+		i+=1;
+	}while(buff[i]!=0);
+	
+	va_end(args);
+}
+
+void printf6(const char * format, ... )
+{
+	char buff[256];
+	unsigned int i=0;
+	va_list args;
+	
+	va_start(args,format);
+	vsnprintf(buff,256,format,args);
+	
+  //print the string
+	do
+	{
+		WriteUSART6(buff[i]);
+		i+=1;
+	}while(buff[i]!=0);
+	
+	va_end(args);
+}
+
 // Check if int is a power of two (contains a single 1)
 int IsPow2 (int x) {
 	return ((x != 0) && !(x & (x - 1)));
