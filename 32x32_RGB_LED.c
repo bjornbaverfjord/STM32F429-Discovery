@@ -178,6 +178,11 @@ const unsigned int pxldata[559]={190, 191, 192, 195, 201, 205, 211, 215, 216, 21
 4, 120, 125, 253, 127, 16, 40, 68, 127, 124, 4, 4, 124, 4, 4, 120, 124, 4, 4, 120, 56, 68, 68, 56, 254, 34,
 34, 28, 28, 34, 34, 254, 124, 4, 72, 84, 84, 36, 126, 68, 60, 64, 64, 124, 12, 48, 64, 48, 12, 28, 96, 16,
 12, 16, 96, 28, 108, 16, 16, 108, 142, 112, 16, 14, 100, 84, 84, 76, 8, 54, 65, 255, 65, 54, 8, 2, 1, 2, 1};
+	
+//0 to 26 character start index
+//27 to 53 words per character
+//54 to 204 words per character
+const unsigned int hebrewfont[205]={0x36, 0x3C, 0x43, 0x49, 0x4E, 0x54, 0x57, 0x5A, 0x60, 0x66, 0x69, 0x6E, 0x74, 0x7A, 0x80, 0x87, 0x8B, 0x8E, 0x94, 0x9A, 0x9F, 0xA5, 0xAB, 0xB1, 0xB7, 0xBD, 0xC5, 0x06, 0x07, 0x06, 0x05, 0x06, 0x03, 0x03, 0x06, 0x06, 0x03, 0x05, 0x06, 0x06, 0x06, 0x07, 0x04, 0x03, 0x06, 0x06, 0x05, 0x06, 0x06, 0x06, 0x06, 0x06, 0x08, 0x08, 0x1738, 0x18E0, 0x1C0, 0x398, 0x6F0, 0x1C30, 0x1838, 0x1830, 0x1830, 0x1830, 0x1C30, 0x1BE0, 0x1800, 0x1800, 0x1838, 0x1830, 0x430, 0x7F0, 0x1C00, 0x38, 0x30, 0x30, 0x1FF0, 0x30, 0x1E38, 0x30, 0x30, 0x30, 0x30, 0x1FF0, 0x38, 0x30, 0x1FF0, 0x38, 0x1FF0, 0x30, 0x1FF8, 0x30, 0x30, 0x30, 0x30, 0x1FF0, 0x38, 0x7F0, 0x1800, 0x1860, 0x1830, 0x7F0, 0x38, 0x130, 0xF0, 0x1838, 0x1830, 0x1830, 0x1830, 0xFE0, 0x38, 0x30, 0x30, 0x30, 0x30, 0xFFF0, 0x01, 0x3F, 0x30, 0x1C30, 0x230, 0x1F0, 0x1E38, 0x1B0, 0x1840, 0x1820, 0x1830, 0x7E0, 0x1FB8, 0x1870, 0x1830, 0x1830, 0x1830, 0x1830, 0x1FE0, 0x1800, 0x1838, 0x1830, 0x1FF0, 0x38, 0x30, 0xFFF0, 0xFB8, 0x1870, 0x1830, 0x1830, 0x1830, 0xFE0, 0x1838, 0x19F0, 0x1F30, 0x800, 0x7B8, 0x70, 0x19F8, 0x1930, 0x1830, 0x1830, 0xFE0, 0x398, 0x370, 0x230, 0x30, 0x30, 0xFFE0, 0x1838, 0x19F0, 0x1B00, 0x1BB8, 0x1E70, 0x1C30, 0x38, 0xFFF0, 0x100, 0xB8, 0x70, 0x30, 0xFFB8, 0x30, 0x1830, 0x430, 0x230, 0x1F0, 0x38, 0x30, 0x30, 0x30, 0x30, 0x1FE0, 0x38, 0x7F0, 0x1C00, 0x1E38, 0x19F0, 0x1800, 0x1C38, 0x3F0, 0x1800, 0x1FB8, 0x70, 0x30, 0x30, 0x30, 0x30, 0x1FE0};
 
 const unsigned int sevsegpxldata[30]=
 {
@@ -192,8 +197,7 @@ const unsigned int sevsegpxldata[30]=
 	1,1,31,	  	//7
 	31,21,31, 	//8
 	23,21,31	//9
-}; 
-
+};
 
 void InitRGBLEDMatrix(void)
 {
@@ -1170,7 +1174,7 @@ void BmpFadeUp(unsigned int bitmap[][32], unsigned int delayMS)
 {	
 	int x, y, r1, g1, b1, r2, g2, b2;
 	unsigned int changed;
-	unsigned int bmp[32][32]={0};
+	unsigned int bmp[LedMatrixWidth][32]={0};
 
 	do
 	{
@@ -1196,6 +1200,35 @@ void BmpFadeUp(unsigned int bitmap[][32], unsigned int delayMS)
 		}
 		DisplayBitmapDuration(bmp, delayMS, DisplayMode8bit);
 	}while(changed==1);
+}
+
+void BmpFadeBetween(unsigned int bitmap1[][32], unsigned int bitmap2[][32])
+{	
+	int x, y, i, r1, g1, b1, r2, g2, b2;
+	unsigned int bmp[LedMatrixWidth][32]={0};
+
+	for(i=0;i<256;i+=2)
+	{
+		for(y=0;y<32;y++)
+		{
+			for(x=0;x<LedMatrixWidth;x++)
+			{
+				r1=bitmap1[x][y]>>16;
+				g1=(bitmap1[x][y]>>8) & 0xFF;
+				b1=bitmap1[x][y] & 0xFF;
+
+				r2=bitmap2[x][y]>>16;
+				g2=(bitmap2[x][y]>>8) & 0xFF;
+				b2=bitmap2[x][y] & 0xFF;
+				
+				r1=r1+(((r2-r1)*i)/255);
+				g1=g1+(((g2-g1)*i)/255);
+				b1=b1+(((b2-b1)*i)/255);
+				bmp[x][y]=(r1<<16) | (g1<<8)  | b1;
+			}
+		}
+		DisplayBitmap(bmp, DisplayMode8bit);
+	}
 }
 
 void BmpLine(unsigned int bitmap[][32], int x1, int y1, int x2, int y2,  unsigned int colour)
@@ -1448,7 +1481,7 @@ void BmpRotate(unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], d
 	}
 }
 
-unsigned int BmpCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int font, unsigned int colour)
+unsigned int BmpCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int colour, unsigned int font)
 {
 	int x;
 	int y;
@@ -1489,7 +1522,7 @@ unsigned int BmpGetCharacterLength(char character)
 	return pxldata[95+(character-' ')];
 }
 
-void BmpShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode)
+void BmpShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int x, y;
 	unsigned int bytenum, mS;
@@ -1505,7 +1538,9 @@ void BmpShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, 
 			{
 				if(((pxldata[bytenum]>>y) & 1)==1){ BmpSetPixel(bitmap,xRight,yTop+y,colour); }
 			}
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 			DisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 			BmpShiftLeft(bitmap,1);	//scroll
 		}
 	}
@@ -1521,16 +1556,62 @@ void BmpShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, 
 					BmpSetPixel(bitmap,xRight,yTop+y-5,colour);
 				}
 			}
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 			DisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 			BmpShiftLeft(bitmap,1);	//scroll
 		}
 	}
 
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 	DisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 	BmpShiftLeft(bitmap,1);	//extra 1px space after the character
 }
 
-void BmpShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode)
+//0 to 26 character start index
+//27 to 53 words per character
+//54 to 204 words per character
+void BmpShiftInCharacterHebrew(unsigned int bitmap[][32], char character, int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
+{
+	unsigned int y, mS, i;
+	int wordnum;
+	
+	mS=1000/fps;
+
+	if(character!=' ')
+	{
+		for(wordnum=hebrewfont[character-1]+hebrewfont[27+(character-1)]-1;wordnum>=hebrewfont[character-1];wordnum--)
+		{
+			ResetTimer14();
+			for(y=0;y<16;y++)	//add word
+			{
+				if(((hebrewfont[wordnum]>>y) & 1)==1){ BmpSetPixel(bitmap,xLeft,yTop+y,colour); }
+			}
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
+			DisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
+			BmpShiftRight(bitmap,1);	//scroll
+		}
+	}else
+	{
+			for(i=0;i<5;i++)
+			{
+				ResetTimer14();
+				if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
+				DisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
+				BmpShiftRight(bitmap,1);	//scroll
+			}
+	}
+
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
+	DisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
+	BmpShiftRight(bitmap,1);	//extra 1px space after the character
+}
+
+void BmpShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int x, y;
 	unsigned int bytenum, mS;
@@ -1549,7 +1630,9 @@ void BmpShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[
 			}
 			
 			BmpReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 			DisplayBitmapDuration(outputbitmap, mS, DisplayMode);		//display frame
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 			BmpShiftLeft(bitmap,1);	//scroll
 		}
 	}
@@ -1566,39 +1649,54 @@ void BmpShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[
 				}
 			}
 			BmpReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 			DisplayBitmapDuration(outputbitmap, mS, DisplayMode);		//display frame
+			if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 			BmpShiftLeft(bitmap,1);	//scroll
 		}
 	}
 
 	BmpReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 	DisplayBitmapDuration(outputbitmap, mS, DisplayMode);		//display frame
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 	BmpShiftLeft(bitmap,1);	//extra 1px space after the character
 }
 
-void BmpScrollText(unsigned int bitmap[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode)
+void BmpScrollText(unsigned int bitmap[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int i=0;
 
 	while(characters[i]!=0)
 	{
-		BmpShiftInCharacter(bitmap, characters[i], xRight, yTop, fps, colour, font, DisplayMode);
+		BmpShiftInCharacter(bitmap, characters[i], xRight, yTop, fps, colour, font, DisplayMode, flipAxis);
 		i++;
 	}
 }
 
-void BmpScrollTextWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode)
+void BmpScrollTextHebrew(unsigned int bitmap[][32], char characters[200], int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int i=0;
 
 	while(characters[i]!=0)
 	{
-		BmpShiftInCharacterWithBG(bitmap, bitmapBG, characters[i], xRight, yTop, fps, colour, font, DisplayMode);
+		BmpShiftInCharacterHebrew(bitmap, characters[i], xLeft, yTop, fps, colour, DisplayMode, flipAxis);
 		i++;
 	}
 }
 
-void BmpScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode)
+void BmpScrollTextWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
+{
+	unsigned int i=0;
+
+	while(characters[i]!=0)
+	{
+		BmpShiftInCharacterWithBG(bitmap, bitmapBG, characters[i], xRight, yTop, fps, colour, font, DisplayMode, flipAxis);
+		i++;
+	}
+}
+
+void BmpScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int unit;
 	unsigned int digit;
@@ -1612,12 +1710,12 @@ void BmpScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int
 		digitval=val/unit;
 		val -= digitval*unit;
 		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ BmpShiftInCharacter(bitmap, digitval+'0', xRight, yTop, fps, colour, font, DisplayMode); }
+		if(print==1){ BmpShiftInCharacter(bitmap, digitval+'0', xRight, yTop, fps, colour, font, DisplayMode, flipAxis); }
 		unit /= 10;
 	}
 }
 
-void BmpScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode)
+void BmpScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int unit;
 	unsigned int digit;
@@ -1631,7 +1729,7 @@ void BmpScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32]
 		digitval=val/unit;
 		val -= digitval*unit;
 		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ BmpShiftInCharacterWithBG(bitmap, bitmapBG, digitval+'0', xRight, yTop, fps, colour, font, DisplayMode); }
+		if(print==1){ BmpShiftInCharacterWithBG(bitmap, bitmapBG, digitval+'0', xRight, yTop, fps, colour, font, DisplayMode, flipAxis); }
 		unit /= 10;
 	}
 }
@@ -1759,7 +1857,7 @@ void BmpSevSegAMPM(unsigned int bitmap[][32], unsigned int AMPM, int xLeft, int 
 	}
 }
 
-void BmpShiftInDigitSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode)
+void BmpShiftInDigitSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int y;
 	unsigned int bytenum;
@@ -1771,16 +1869,20 @@ void BmpShiftInDigitSevSeg(unsigned int bitmap[][32], unsigned int val, int xRig
 		{
 			if(((sevsegpxldata[bytenum]>>y) & 1)==1){ BmpSetPixel(bitmap,xRight,y+yTop,colour); }
 		}
+		if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 		DisplayBitmapDuration(bitmap, 1000/fps, DisplayMode);		//display frame
+		if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 		BmpShiftLeft(bitmap,1);	//scroll
 	}
 
 	ResetTimer14();
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 	DisplayBitmapDuration(bitmap, 1000/fps, DisplayMode);		//display frame
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 	BmpShiftLeft(bitmap,1);	//extra 1px space after the character
 }
 
-void BmpShiftInDigitSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode)
+void BmpShiftInDigitSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int y;
 	unsigned int bytenum;
@@ -1794,16 +1896,20 @@ void BmpShiftInDigitSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapB
 			if(((sevsegpxldata[bytenum]>>y) & 1)==1){ BmpSetPixel(bitmap,xRight,y+yTop,colour); }
 		}
 		BmpReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
+		if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 		DisplayBitmapDuration(bitmap, 1000/fps, DisplayMode);		//display frame
+		if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 		BmpShiftLeft(bitmap,1);	//scroll
 	}
 
 	ResetTimer14();
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//flip
 	DisplayBitmapDuration(bitmap, 1000/fps, DisplayMode);		//display frame
+	if(flipAxis!=LEDNoFlip){ BmpFlip(bitmap,flipAxis); }	//unflip
 	BmpShiftLeft(bitmap,1);	//extra 1px space after the character
 }
 
-void BmpScrollValueSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode)
+void BmpScrollValueSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int unit;
 	unsigned int digit;
@@ -1817,12 +1923,12 @@ void BmpScrollValueSevSeg(unsigned int bitmap[][32], unsigned int val, int xRigh
 		digitval=val/unit;
 		val -= digitval*unit;
 		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ BmpShiftInDigitSevSeg(bitmap, digitval, xRight, yTop, fps, colour, DisplayMode); }
+		if(print==1){ BmpShiftInDigitSevSeg(bitmap, digitval, xRight, yTop, fps, colour, DisplayMode, flipAxis); }
 		unit /= 10;
 	}
 }
 
-void BmpScrollValueSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode)
+void BmpScrollValueSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int unit;
 	unsigned int digit;
@@ -1836,7 +1942,7 @@ void BmpScrollValueSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG
 		digitval=val/unit;
 		val -= digitval*unit;
 		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ BmpShiftInDigitSevSegWithBG(bitmap, bitmapBG, digitval, xRight, yTop, fps, colour, DisplayMode); }
+		if(print==1){ BmpShiftInDigitSevSegWithBG(bitmap, bitmapBG, digitval, xRight, yTop, fps, colour, DisplayMode, flipAxis); }
 		unit /= 10;
 	}
 }
@@ -2005,7 +2111,7 @@ unsigned int PrintValue2DigitsSevSegLarge(unsigned int bitmap[][32], unsigned in
 	return xpos;
 }
 
-void PrintfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
+void printfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
 {
 	char buff[256];
 	unsigned int i=0;
@@ -2017,7 +2123,7 @@ void PrintfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font,
   //print the string
 	do
 	{
-		x1=BmpCharacter(bitmap, buff[i], x1, y1, font, colour);
+		x1=BmpCharacter(bitmap, buff[i], x1, y1, colour, font);
 		i+=1;
 	}while(buff[i]!=0);
 	
@@ -2037,7 +2143,7 @@ void BmpPlaceBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitm
 	}
 }
 
-void BmpShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xRight, int yTop, unsigned int endgap, unsigned int fps, unsigned int DisplayMode)
+void BmpShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xRight, int yTop, unsigned int endgap, unsigned int fps, unsigned int DisplayMode, unsigned int flipAxis)
 {
 	unsigned int x, y, mS;
 	
@@ -2049,13 +2155,60 @@ void BmpShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbi
 		{
 			BmpSetPixel(destbitmap,xRight,yTop+y,sourcebitmap[x][y]);
 		}
+		if(flipAxis!=LEDNoFlip){ BmpFlip(destbitmap,flipAxis); }	//flip
 		DisplayBitmapDuration(destbitmap, mS, DisplayMode);		//display frame
+		if(flipAxis!=LEDNoFlip){ BmpFlip(destbitmap,flipAxis); }	//unflip
 		BmpShiftLeft(destbitmap,1);	//scroll
 	}
 
 	for(x=0;x<endgap;x++)
 	{
+		if(flipAxis!=LEDNoFlip){ BmpFlip(destbitmap,flipAxis); }	//flip
 		DisplayBitmapDuration(destbitmap, mS, DisplayMode);		//display frame
+		if(flipAxis!=LEDNoFlip){ BmpFlip(destbitmap,flipAxis); }	//unflip
 		BmpShiftLeft(destbitmap,1);
+	}
+}
+
+void BmpFlip(unsigned int bitmap[][32], unsigned int flipAxis)
+{
+	unsigned int bmp[LedMatrixWidth][32], x, y;
+	
+	if(flipAxis & 1)	//flip X
+	{
+		for(y=0;y<32;y++)
+		{
+			for(x=0;x<LedMatrixWidth;x++)
+			{
+				bmp[x][y]=bitmap[(LedMatrixWidth-1)-x][y];
+			}
+		}
+		
+		for(y=0;y<32;y++)	//write back
+		{
+			for(x=0;x<LedMatrixWidth;x++)
+			{
+				bitmap[x][y]=bmp[x][y];
+			}
+		}
+	}
+	
+	if(flipAxis & 2)	//flip Y
+	{
+		for(y=0;y<32;y++)
+		{
+			for(x=0;x<LedMatrixWidth;x++)
+			{
+				bmp[x][y]=bitmap[x][31-y];
+			}
+		}
+		
+		for(y=0;y<32;y++)	//write back
+		{
+			for(x=0;x<LedMatrixWidth;x++)
+			{
+				bitmap[x][y]=bmp[x][y];
+			}
+		}
 	}
 }

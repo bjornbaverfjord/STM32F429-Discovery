@@ -935,73 +935,6 @@ unsigned int USART6DataIsAvailable(void)	// Return 1 if a character is in the bu
 	return USARTDataIsAvailable((unsigned int *)&USART6_SR);
 }
 
-void PrintfUSART(volatile unsigned int *USART_SR, volatile unsigned int *USART_DR, const char * format, ... )
-{
-	char buff[256];
-	unsigned int i=0;
-	va_list args;
-	
-	va_start(args,format);
-	vsnprintf(buff,256,format,args);
-	
-  //print the string
-	do
-	{
-		WriteUSART(buff[i], (unsigned int *)&USART_SR, (unsigned int *)&USART_DR);
-		i+=i;
-	}while(buff[i]!=0);
-	
-	va_end(args);
-}
-
-void Printf1(const char * format, ... )
-{
-	va_list args;
-	va_start(args,format);
-	PrintfUSART((unsigned int *)&USART1_SR, (unsigned int *)&USART1_DR, format, args );
-	va_end(args);
-}
-
-void Printf2(const char * format, ... )
-{
-	va_list args;
-	va_start(args,format);
-	PrintfUSART((unsigned int *)&USART2_SR, (unsigned int *)&USART2_DR, format, args );
-	va_end(args);
-}
-
-void Printf3(const char * format, ... )
-{
-	va_list args;
-	va_start(args,format);
-	PrintfUSART((unsigned int *)&USART3_SR, (unsigned int *)&USART3_DR, format, args );
-	va_end(args);
-}
-
-void Printf4(const char * format, ... )
-{
-	va_list args;
-	va_start(args,format);
-	PrintfUSART((unsigned int *)&UART4_SR, (unsigned int *)&UART4_DR, format, args );
-	va_end(args);
-}
-
-void Printf5(const char * format, ... )
-{
-	va_list args;
-	va_start(args,format);
-	PrintfUSART((unsigned int *)&UART5_SR, (unsigned int *)&UART5_DR, format, args );
-	va_end(args);
-}
-
-void Printf6(const char * format, ... )
-{
-	va_list args;
-	va_start(args,format);
-	PrintfUSART((unsigned int *)&USART6_SR, (unsigned int *)&USART6_DR, format, args );
-	va_end(args);
-}
-
 void InitRandomNumberGenerator(void)
 {
 	RCC_AHB2ENR |= 1UL<<6;	//Random number generator clock enable
@@ -2730,7 +2663,7 @@ void InitRTC(unsigned int year, unsigned int month, unsigned int date, unsigned 
 {
 	RCC_CFGR |= 8<<16;	//HSE/8 (8MHz xtal) to give 1Mhz to the RTC
 	RCC_APB1ENR |= 1<<28;	//Power interface clock enable
-	RCC_APB1ENR |= 1<<18;	//Backup SRAM interface clock enable
+	RCC_AHB1ENR |= 1<<18;	//Backup SRAM interface clock enable
 	PWR_CR |= 1<<8;		//the DBP bit (Access to RTC and RTC Backup registers and backup SRAM enabled) in the PWR power control register (PWR_CR) for STM32F42xxx and STM32F43xxx has to be set before these can be modified
 	RCC_BDCR |= 3<<8;	//HSE oscillator clock selected for RTC
 	RCC_BDCR |= 1<<15;	//RTC clock enabled
@@ -2739,9 +2672,11 @@ void InitRTC(unsigned int year, unsigned int month, unsigned int date, unsigned 
 	RTC_WPR=0xCA;
 	RTC_WPR=0x53;
 	
+	if(format==0){ RTC_CR &= ~(1<<6); }else{ RTC_CR |= 1<<6; }	//0=24 hour/day format, 1=AM/PM hour format
+	
 	RTC_ISR |= 1<<7; //Set INIT bit to 1 in the RTC_ISR to stop the calendar counter and allow its value can be updated
 	while(((RTC_ISR>>6) & 1)==0);	//Poll INITF bit of in the RTC_ISR register to wait for initialization phase mode to be entered
-	
+
 	//write TWICE to RTC_PRER to set the prescalers to generate 1Hz
 	/*
 	f CK_SPRE (1Hz)=(f RTCCLK (1MHz) / (PREDIV_A+1) / (PREDIV_S+1)
@@ -2778,10 +2713,8 @@ void InitRTC(unsigned int year, unsigned int month, unsigned int date, unsigned 
 	RTC_DR |= date%10;	//date (units)
 	
 	RTCyear=year;	//global register
-	
-	if(format==0){ RTC_CR &= ~(1<<6); }else{ RTC_CR |= 1<<6; }	//0=24 hour/day format, 1=AM/PM hour format
-	
-	RTC_ISR |= ~(1<<7);	//Exit the initialization mode by clearing the INIT bit. When the initialization sequence is complete, the calendar starts counting
+
+	RTC_ISR &= ~(1<<7);	//Exit the initialization mode by clearing the INIT bit. When the initialization sequence is complete, the calendar starts counting
 	while(((RTC_ISR>>5) & 1)==0);	//After an initialization, the software must wait until RSF is set before reading the RTC_SSR, RTC_TR and RTC_DR registers
 
 	//The daylight saving time management is performed through bits SUB1H, ADD1H, and BKP of the RTC_CR register, must be set outside initialization mode
@@ -2804,9 +2737,9 @@ struct RTCType ReadRTC(void)
 	DateTime.Minutes=(((RTC_TR>>12) & 7)*10)+((RTC_TR>>8) & 0xF);
 	DateTime.Seconds=(((RTC_TR>>4) & 7)*10)+(RTC_TR & 0xF);
 	DateTime.Year=(RTCyear-(RTCyear%100))+(((RTC_DR>>20) & 0xF)*10)+((RTC_DR>>16) & 0xF);
-	DateTime.DayOfWeek=((RTC_DR>>3) & 7);
-	DateTime.Month=(((RTC_TR>>12) & 1)*10)+((RTC_TR>>8) & 0xF);
-	DateTime.Date=(((RTC_TR>>4) & 3)*10)+(RTC_TR & 0xF);
+	DateTime.DayOfWeek=((RTC_DR>>13) & 7);
+	DateTime.Month=(((RTC_DR>>12) & 1)*10)+((RTC_DR>>8) & 0xF);
+	DateTime.Date=(((RTC_DR>>4) & 3)*10)+(RTC_DR & 0xF);
 	
 	RTC_ISR &= ~(1>>5);	//RSF must be cleared by software after the first calendar read, and then the software must wait until RSF is set before reading again the RTC_SSR, RTC_TR and RTC_DR registers
 

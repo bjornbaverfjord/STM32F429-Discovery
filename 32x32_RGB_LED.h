@@ -119,11 +119,45 @@ PG2, PG3, PG13 (green led), PG14 (red led)
 #define LED8BITRED 0xFF0000
 #define LED8BITGREEN 0x00FF00
 #define LED8BITBLUE 0x0000FF
-#define LED8BITYELLOW 0xFFFF 00
+#define LED8BITYELLOW 0xFFFF00
 #define LED8BITCYAN 0x00FFFF
 #define LED8BITPURPLE 0xFF00FF
 #define LED8BITWHITE 0xFFFFFF
 #define LED8BITORANGE 0xFF7F00
+
+#define LEDNoFlip 0
+#define LEDXFlip 1
+#define LEDYFlip 2
+#define LEDXYFlip 3
+
+//for the hebrew font
+#define HEB_aleph 1	//0=end of string
+#define HEB_bet 2
+#define HEB_gimel 3
+#define HEB_dalet 4
+#define HEB_he 5
+#define HEB_vav 6
+#define HEB_zayin 7
+#define HEB_het 8
+#define HEB_tet 9
+#define HEB_yod 10
+#define HEB_kaf 11
+#define HEB_kafsofit 12
+#define HEB_lamed 13
+#define HEB_mem 14
+#define HEB_memsofit 15
+#define HEB_nun 16
+#define HEB_nunsofit 17
+#define HEB_samekh 18
+#define HEB_ayin 19
+#define HEB_pe 20
+#define HEB_pesofit 21
+#define HEB_tsady 22
+#define HEB_tsadysofit 23
+#define HEB_Quf 24
+#define HEB_resh 25
+#define HEB_shin 26
+#define HEB_tav 27
 
 void InitRGBLEDMatrix(void);
 
@@ -161,6 +195,7 @@ void BmpShiftRight(unsigned int bitmap[][32], int shift);
 void BmpShiftUp(unsigned int bitmap[][32], int shift);
 void BmpShiftDown(unsigned int bitmap[][32], int shift);
 void BmpRotate(unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], double angle, double midx, double midy);
+void BmpFlip(unsigned int bitmap[][32], unsigned int flipAxis);	//use with LEDXFlip/LEDYFlip/LEDXYFlip
 void BmpPlaceBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xpos, int ypos);
 
 void BmpReplaceColourWithColour(unsigned int bitmap[][32], unsigned int ColourToReplace, unsigned int ReplacementColour);
@@ -168,6 +203,7 @@ void BmpReplaceColourWithBmp(unsigned int bitmap[][32], unsigned int ColourToRep
 void BmpReplaceColourWithBmpIntoBmp(unsigned int bitmap[][32], unsigned int ColourToReplace, unsigned int backgroundbitmap[][32], unsigned int destbitmap[][32]);
 void BmpFadeDown(unsigned int bitmap[][32], unsigned int delayMS);	//8 bit mode only
 void BmpFadeUp(unsigned int bitmap[][32], unsigned int delayMS);	//8 bit mode only
+void BmpFadeBetween(unsigned int bitmap1[][32], unsigned int bitmap2[][32]);	//8 bit mode only
 
 void BmpLine(unsigned int bitmap[][32], int x1, int y1, int x2, int y2,  unsigned int colour);
 void BmpRectangle(unsigned int bitmap[][32], int x1, int y1, int x2, int y2,  unsigned int colour);
@@ -175,26 +211,30 @@ void BmpRectangleFilled(unsigned int bitmap[][32], int x1, int y1, int x2, int y
 void BmpCircle(unsigned int bitmap[][32], int x0, int y0, int radius, unsigned int colour);
 void BmpCircleFilled(unsigned int bitmap[][32], int x0, int y0, int radius, unsigned int colour);
 
+//for functions using flipaxis, supply one of these: LEDNoFlip/LEDXFlip/LEDYFlip/LEDXYFlip
 unsigned int BmpCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int colour, unsigned int font);	//font must be LedFontVariableWidth or LedFont7x11. returns the x position for the next character. 
 unsigned int BmpGetCharacterLength(char character);
-void BmpShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode);
-void BmpShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode);
-void BmpScrollText(unsigned int bitmap[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode);
-void BmpScrollTextWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode);
-void BmpScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode);
-void BmpScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode);
+void BmpShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollText(unsigned int bitmap[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollTextWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
 
-void BmpShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xRight, int yTop, unsigned int endgap, unsigned int fps, unsigned int DisplayMode);
+void BmpShiftInCharacterHebrew(unsigned int bitmap[][32], char character, int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollTextHebrew(unsigned int bitmap[][32], char characters[200], int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
 
-void PrintfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );	//font must be LedFontVariableWidth or LedFont7x11
+void BmpShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xRight, int yTop, unsigned int endgap, unsigned int fps, unsigned int DisplayMode, unsigned int flipAxis);
+
+void printfNx32LED(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );	//font must be LedFontVariableWidth or LedFont7x11
 
 void BmpSevSegDigit(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int colour);
 unsigned int BmpSevSegSegMultiDigits(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int ForceDigits, unsigned int colour);	//returns x position for next character. if ForceDigits= 0 or 1 then it will use as many digits as needed, 2 or more will left append 0s if needed
 void BmpSevSegAMPM(unsigned int bitmap[][32], unsigned int AMPM, int xLeft, int yTop, unsigned int DispM, unsigned int colour);	//0 for AM, 1 for PM, DispM=0 will not show the M
-void BmpShiftInDigitSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode);
-void BmpShiftInDigitSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode);
-void BmpScrollValueSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode);
-void BmpScrollValueSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode);
+void BmpShiftInDigitSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpShiftInDigitSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollValueSevSeg(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
+void BmpScrollValueSevSegWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
 
 void DrawSegmentLarge(unsigned int bitmap[][32], unsigned int x, unsigned int y, unsigned int length, unsigned int width, unsigned int type, unsigned int colour);
 unsigned int SevSegDigitLarge(unsigned int bitmap[][32], unsigned int digit, unsigned int x, unsigned int y, unsigned int height, unsigned int thickness, unsigned int gap, unsigned int colour);
