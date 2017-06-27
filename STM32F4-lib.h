@@ -238,7 +238,7 @@ int ConfigPin(unsigned int pin, char c, volatile unsigned int *GPIO_MODER, volat
 //void ConfigPinOnPort(char port, unsigned int pin, char c);	//port must be 'A' to 'I', pin is 0 to 15, c is the character for the pin mode, see ConfigPort
 
 
-void TogglePin(char port, unsigned int pin);	//sets the pin low. port must be 'A' to 'I', pin is 0 to 15
+void TogglePin(char port, unsigned int pin);	//toggles the pin. port must be 'A' to 'I', pin is 0 to 15
 unsigned int ReadPin(char port, unsigned int pin);	//returns 1 or 0. port must be 'A' to 'I', pin is 0 to 15
 
 //AF---------------------------------------------------------------
@@ -252,6 +252,30 @@ void SetAFG(unsigned int pin, unsigned int AFnum);
 void SetAFH(unsigned int pin, unsigned int AFnum);
 void SetAFI(unsigned int pin, unsigned int AFnum);
 void SetAF(volatile unsigned int *GPIO_AFRL, volatile unsigned int *GPIO_AFRH, unsigned int pin, unsigned int AFnum);
+
+//returns the 4 bit alternate function of a pin
+unsigned int GetPinAFA(unsigned int pinnumber);
+unsigned int GetPinAFB(unsigned int pinnumber);
+unsigned int GetPinAFC(unsigned int pinnumber);
+unsigned int GetPinAFD(unsigned int pinnumber);
+unsigned int GetPinAFE(unsigned int pinnumber);
+unsigned int GetPinAFF(unsigned int pinnumber);
+unsigned int GetPinAFG(unsigned int pinnumber);
+unsigned int GetPinAFH(unsigned int pinnumber);
+unsigned int GetPinAFI(unsigned int pinnumber);
+unsigned int GetPinAF(unsigned int port, unsigned int pinnumber);
+
+//returns 1 if the pin is alternate function, otherwise returns 0
+unsigned int IsPinAFA(unsigned int pinnumber);
+unsigned int IsPinAFB(unsigned int pinnumber);
+unsigned int IsPinAFC(unsigned int pinnumber);
+unsigned int IsPinAFD(unsigned int pinnumber);
+unsigned int IsPinAFE(unsigned int pinnumber);
+unsigned int IsPinAFF(unsigned int pinnumber);
+unsigned int IsPinAFG(unsigned int pinnumber);
+unsigned int IsPinAFH(unsigned int pinnumber);
+unsigned int IsPinAFI(unsigned int pinnumber);
+unsigned int IsPinAF(unsigned int port, unsigned int pinnumber);
 
 //USART/UART---------------------------------------------------------------
 void InitUSART1(unsigned int baud);	//TX: PA9 RX: PA10
@@ -676,5 +700,46 @@ unsigned int IsRTCUpdated(void);	//outputs 1 if updated since last read else 0
 struct RTCType ReadRTC(void);	//outputs AMPM (RTCAM=AM or 24 hour mode, RTCPM=PM), Hours, Minutes, Seconds, Year, DayOfWeek (1=monday or RTCMonday), Month, Date. this also resets the read flag
 
 
+//systick-------------------------------------------------------------------------------
 unsigned int configSYSTICK(unsigned int timebase);	// Configure the systick timer with a timebase in ns, return the true timebase
 void waitsys (unsigned int ticks);	// Wait for n ticks of SYSTICK timer, period set with configSYSTICK(unsigned int timebase)
+
+
+//GPIO interrupts-----------------------------------------------------------------------
+/*
+pins of the same number, on different ports, will share the same interrupt.
+pins 5 to 9 share the same interrupt, check the EXTI_PR bits.
+pins 10 to 15 share the same interrupt, check the EXTI_PR bits.
+if the pin is set as output, it will be changed to input, you can set it back after if required.
+interrupts can also be enabled on pins set as input/output AF mode, however, if pin is AF, pin wont be configured to input mode.
+
+edge must be either: Capture_Rising_Edge, Capture_Falling_Edge, Capture_Both_Edges
+
+Example usage:
+InitGPIOAInterrupts(4,Capture_Falling_Edge);	//vsync output pin
+
+//for pins 0 to 4, use EXTI0_IRQHandler to EXTI4_IRQHandler
+//for pins 5 to 9, use EXTI9_5_IRQHandler
+//for pins 10 to 10, use EXTI10_15_IRQHandler
+void EXTI4_IRQHandler(void)
+{
+	DisableInterruptPosition(EXTI4_Interrupt_Position);
+		
+	FlipBuffGraphics(ClearBufferAfterFlip);
+	//draw stuff here
+	
+	EXTI_PR=1<<4;	//clear the interrupt pending bit on line 4 (clear by writing 1)
+	EnableInterruptPosition(EXTI4_Interrupt_Position);
+}
+*/
+void InitGPIOAInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOBInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOCInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIODInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOEInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOFInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOGInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOHInterrupts(unsigned int pinnumber, unsigned int edge);
+void InitGPIOIInterrupts(unsigned int pinnumber, unsigned int edge);
+
+void InitGPIOInterrupts(unsigned int port, unsigned int pinnumber, unsigned int edge);

@@ -421,3 +421,15 @@
     
 
 #define PWR_CR                      (*((volatile unsigned long *) 0x40007000))
+	
+
+#define EXTI_IMR                    (*((volatile unsigned long *) 0x40013C00))
+#define EXTI_RTSR                   (*((volatile unsigned long *) 0x40013C08))
+#define EXTI_FTSR                   (*((volatile unsigned long *) 0x40013C0C))
+#define EXTI_PR                     (*((volatile unsigned long *) 0x40013C14))
+
+
+#define SYSCFG_EXTICR1              (*((volatile unsigned long *) 0x40013808))
+#define SYSCFG_EXTICR2              (*((volatile unsigned long *) 0x4001380C))
+#define SYSCFG_EXTICR3              (*((volatile unsigned long *) 0x40013810))
+#define SYSCFG_EXTICR4              (*((volatile unsigned long *) 0x40013814))

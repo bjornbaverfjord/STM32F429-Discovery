@@ -2771,3 +2771,217 @@ void waitsys (unsigned int ticks) {
 		if (SYSTICK_CSR & (1<<16)) ticks -= 1;
 	}
 }
+
+unsigned int GetPinAF(unsigned int port, unsigned int pinnumber)
+{
+	unsigned int portAF, pinAF;
+	
+	switch(port)
+	{
+		case PORTA:
+			if(pinnumber<8){ portAF=GPIOA_AFRL; }else{ portAF=GPIOA_AFRH; }
+			break;
+		case PORTB:
+			if(pinnumber<8){ portAF=GPIOB_AFRL; }else{ portAF=GPIOB_AFRH; }
+			break;
+		case PORTC:
+			if(pinnumber<8){ portAF=GPIOC_AFRL; }else{ portAF=GPIOC_AFRH; }
+			break;
+		case PORTD:
+			if(pinnumber<8){ portAF=GPIOD_AFRL; }else{ portAF=GPIOD_AFRH; }
+			break;
+		case PORTE:
+			if(pinnumber<8){ portAF=GPIOE_AFRL; }else{ portAF=GPIOE_AFRH; }
+			break;
+		case PORTF:
+			if(pinnumber<8){ portAF=GPIOF_AFRL; }else{ portAF=GPIOF_AFRH; }
+			break;
+		case PORTG:
+			if(pinnumber<8){ portAF=GPIOG_AFRL; }else{ portAF=GPIOG_AFRH; }
+			break;
+		case PORTH:
+			if(pinnumber<8){ portAF=GPIOH_AFRL; }else{ portAF=GPIOH_AFRH; }
+			break;
+		case PORTI:
+			if(pinnumber<8){ portAF=GPIOI_AFRL; }else{ portAF=GPIOI_AFRH; }
+			break;
+		default:
+			break;
+	}
+	
+	if(pinnumber>7){ pinnumber-=8; }
+	pinAF=(portAF>>(pinnumber<<2)) & 0xF;
+	
+	return pinAF;
+}
+
+unsigned int GetPinAFA(unsigned int pinnumber){ return GetPinAF(PORTA, pinnumber); }
+unsigned int GetPinAFB(unsigned int pinnumber){ return GetPinAF(PORTB, pinnumber); }
+unsigned int GetPinAFC(unsigned int pinnumber){ return GetPinAF(PORTC, pinnumber); }
+unsigned int GetPinAFD(unsigned int pinnumber){ return GetPinAF(PORTD, pinnumber); }
+unsigned int GetPinAFE(unsigned int pinnumber){ return GetPinAF(PORTE, pinnumber); }
+unsigned int GetPinAFF(unsigned int pinnumber){ return GetPinAF(PORTF, pinnumber); }
+unsigned int GetPinAFG(unsigned int pinnumber){ return GetPinAF(PORTG, pinnumber); }
+unsigned int GetPinAFH(unsigned int pinnumber){ return GetPinAF(PORTH, pinnumber); }
+unsigned int GetPinAFI(unsigned int pinnumber){ return GetPinAF(PORTI, pinnumber); }
+
+unsigned int IsPinAF(unsigned int port, unsigned int pinnumber)
+{
+	if(GetPinAF(port, pinnumber)==0){ return 0; }else{ return 1; }
+}
+
+unsigned int IsPinAFA(unsigned int pinnumber){ return IsPinAF(PORTA, pinnumber); }
+unsigned int IsPinAFB(unsigned int pinnumber){ return IsPinAF(PORTB, pinnumber); }
+unsigned int IsPinAFC(unsigned int pinnumber){ return IsPinAF(PORTC, pinnumber); }
+unsigned int IsPinAFD(unsigned int pinnumber){ return IsPinAF(PORTD, pinnumber); }
+unsigned int IsPinAFE(unsigned int pinnumber){ return IsPinAF(PORTE, pinnumber); }
+unsigned int IsPinAFF(unsigned int pinnumber){ return IsPinAF(PORTF, pinnumber); }
+unsigned int IsPinAFG(unsigned int pinnumber){ return IsPinAF(PORTG, pinnumber); }
+unsigned int IsPinAFH(unsigned int pinnumber){ return IsPinAF(PORTH, pinnumber); }
+unsigned int IsPinAFI(unsigned int pinnumber){ return IsPinAF(PORTI, pinnumber); }
+
+void InitGPIOInterrupts(unsigned int port, unsigned int pinnumber, unsigned int edge)
+{
+	unsigned int portnum;
+	
+	//check if the pin is used as AF, if so, dont reconfigure it
+	if(IsPinAF(port, pinnumber)==0)
+	{
+		ConfigPinOnPort(port,pinnumber,'i');
+	}
+	
+	EXTI_IMR=1<<pinnumber;	//EXTI line number selection
+	switch(edge)
+	{
+		case Capture_Rising_Edge:
+			EXTI_RTSR=1<<pinnumber;	//line selection for rising trigger
+			break;
+		case Capture_Falling_Edge:
+			EXTI_FTSR=1<<pinnumber;	//line selection for falling trigger
+			break;
+		case Capture_Both_Edges:
+			EXTI_RTSR=1<<pinnumber;	//line selection for rising trigger
+			EXTI_FTSR=1<<pinnumber;	//line selection for falling trigger
+			break;
+		default:
+			break;
+	}
+	
+	switch(port)
+	{
+		case PORTA:
+			portnum=0;
+			break;
+		case PORTB:
+			portnum=1;
+			break;
+		case PORTC:
+			portnum=2;
+			break;
+		case PORTD:
+			portnum=3;
+			break;
+		case PORTE:
+			portnum=4;
+			break;
+		case PORTF:
+			portnum=5;
+			break;
+		case PORTG:
+			portnum=6;
+			break;
+		case PORTH:
+			portnum=7;
+			break;
+		case PORTI:
+			portnum=8;
+			break;
+		default:
+			break;
+	}
+	
+	RCC_APB2ENR |= 1<<14;	//clock enable for SYSCFG
+	switch(pinnumber>>2)	//Select port for EXTI
+	{
+		case 0:
+			SYSCFG_EXTICR1 = (SYSCFG_EXTICR1 & ~0xF) | portnum;	
+			break;
+		case 1:
+			SYSCFG_EXTICR2 = (SYSCFG_EXTICR2 & ~0xF) | portnum;
+			break;
+		case 2:
+			SYSCFG_EXTICR3 = (SYSCFG_EXTICR3 & ~0xF) | portnum;
+			break;
+		case 3:
+			SYSCFG_EXTICR4 = (SYSCFG_EXTICR4 & ~0xF) | portnum;
+			break;
+		default:
+			break;
+	}
+	
+	switch(pinnumber)
+	{
+		case 0:
+			EnableInterruptPosition(EXTI0_Interrupt_Position);
+			break;
+		case 1:
+			EnableInterruptPosition(EXTI1_Interrupt_Position);
+			break;
+		case 2:
+			EnableInterruptPosition(EXTI2_Interrupt_Position);
+			break;
+		case 3:
+			EnableInterruptPosition(EXTI3_Interrupt_Position);
+			break;
+		case 4:
+			EnableInterruptPosition(EXTI4_Interrupt_Position);
+			break;
+		
+		case 5:
+			EnableInterruptPosition(EXTI9_5_Interrupt_Position);
+			break;
+		case 6:
+			EnableInterruptPosition(EXTI9_5_Interrupt_Position);
+			break;
+		case 7:
+			EnableInterruptPosition(EXTI9_5_Interrupt_Position);
+			break;
+		case 8:
+			EnableInterruptPosition(EXTI9_5_Interrupt_Position);
+			break;
+		case 9:
+			EnableInterruptPosition(EXTI9_5_Interrupt_Position);
+			break;
+		
+		case 10:
+			EnableInterruptPosition(EXTI15_10_Interrupt_Position);
+			break;
+		case 11:
+			EnableInterruptPosition(EXTI15_10_Interrupt_Position);
+			break;
+		case 12:
+			EnableInterruptPosition(EXTI15_10_Interrupt_Position);
+			break;
+		case 13:
+			EnableInterruptPosition(EXTI15_10_Interrupt_Position);
+			break;
+		case 14:
+			EnableInterruptPosition(EXTI15_10_Interrupt_Position);
+			break;
+		case 15:
+			EnableInterruptPosition(EXTI15_10_Interrupt_Position);
+			break;
+		default:
+			break;
+	}
+}
+	
+void InitGPIOAInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTA, pinnumber, edge); }
+void InitGPIOBInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTB, pinnumber, edge); }
+void InitGPIOCInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTC, pinnumber, edge); }
+void InitGPIODInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTD, pinnumber, edge); }
+void InitGPIOEInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTE, pinnumber, edge); }
+void InitGPIOFInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTF, pinnumber, edge); }
+void InitGPIOGInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTG, pinnumber, edge); }
+void InitGPIOHInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTH, pinnumber, edge); }
+void InitGPIOIInterrupts(unsigned int pinnumber, unsigned int edge){ InitGPIOInterrupts(PORTI, pinnumber, edge); }
