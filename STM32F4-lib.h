@@ -9,6 +9,114 @@
 #define DAC_Unbuffered 0
 #define DAC_Buffered 1
 
+#define ADC1_PA0 (1)
+#define ADC1_PA1 (1<<1)
+#define ADC1_PA2 (1<<2)
+#define ADC1_PA3 (1<<3)
+#define ADC1_PA4 (1<<4)
+#define ADC1_PA5 (1<<5)
+#define ADC1_PA6 (1<<6)
+#define ADC1_PA7 (1<<7)
+#define ADC1_PB0 (1<<8)
+#define ADC1_PB1 (1<<9)
+#define ADC1_PC0 (1<<10)
+#define ADC1_PC1 (1<<11)
+#define ADC1_PC2 (1<<12)
+#define ADC1_PC3 (1<<13)
+#define ADC1_PC4 (1<<14)
+#define ADC1_PC5 (1<<15)
+#define ADC1_Temp (1<<16)
+#define ADC1_Vref (1<<17)
+#define ADC1_Vbat (1<<18)
+
+#define ADC2_PA0 (1)
+#define ADC2_PA1 (1<<1)
+#define ADC2_PA2 (1<<2)
+#define ADC2_PA3 (1<<3)
+#define ADC2_PA4 (1<<4)
+#define ADC2_PA5 (1<<5)
+#define ADC2_PA6 (1<<6)
+#define ADC2_PA7 (1<<7)
+#define ADC2_PB0 (1<<8)
+#define ADC2_PB1 (1<<9)
+#define ADC2_PC0 (1<<10)
+#define ADC2_PC1 (1<<11)
+#define ADC2_PC2 (1<<12)
+#define ADC2_PC3 (1<<13)
+#define ADC2_PC4 (1<<14)
+#define ADC2_PC5 (1<<15)
+
+#define ADC3_PA0 (1)
+#define ADC3_PA1 (1<<1)
+#define ADC3_PA2 (1<<2)
+#define ADC3_PA3 (1<<3)
+#define ADC3_PF6 (1<<4)
+#define ADC3_PF7 (1<<5)
+#define ADC3_PF8 (1<<6)
+#define ADC3_PF9 (1<<7)
+#define ADC3_PF10 (1<<8)
+#define ADC3_PF3 (1<<9)
+#define ADC3_PC0 (1<<10)
+#define ADC3_PC1 (1<<11)
+#define ADC3_PC2 (1<<12)
+#define ADC3_PC3 (1<<13)
+#define ADC3_PF4 (1<<14)
+#define ADC3_PF5 (1<<15)
+
+#define ADC1_Read_PA0 0
+#define ADC1_Read_PA1 1
+#define ADC1_Read_PA2 2
+#define ADC1_Read_PA3 3
+#define ADC1_Read_PA4 4
+#define ADC1_Read_PA5 5
+#define ADC1_Read_PA6 6
+#define ADC1_Read_PA7 7
+#define ADC1_Read_PB0 8
+#define ADC1_Read_PB1 9
+#define ADC1_Read_PC0 10
+#define ADC1_Read_PC1 11
+#define ADC1_Read_PC2 12
+#define ADC1_Read_PC3 13
+#define ADC1_Read_PC4 14
+#define ADC1_Read_PC5 15
+#define ADC1_Read_Temp 16
+#define ADC1_Read_Vref 17
+#define ADC1_Read_Vbat 18
+
+#define ADC2_Read_PA0 0
+#define ADC2_Read_PA1 1
+#define ADC2_Read_PA2 2
+#define ADC2_Read_PA3 3
+#define ADC2_Read_PA4 4
+#define ADC2_Read_PA5 5
+#define ADC2_Read_PA6 6
+#define ADC2_Read_PA7 7
+#define ADC2_Read_PB0 8
+#define ADC2_Read_PB1 9
+#define ADC2_Read_PC0 10
+#define ADC2_Read_PC1 11
+#define ADC2_Read_PC2 12
+#define ADC2_Read_PC3 13
+#define ADC2_Read_PC4 14
+#define ADC2_Read_PC5 15
+
+#define ADC3_Read_PA0 0
+#define ADC3_Read_PA1 1
+#define ADC3_Read_PA2 2
+#define ADC3_Read_PA3 3
+#define ADC3_Read_PF6 4
+#define ADC3_Read_PF7 5
+#define ADC3_Read_PF8 6
+#define ADC3_Read_PF9 7
+#define ADC3_Read_PF10 8
+#define ADC3_Read_PF3 9
+#define ADC3_Read_PC0 10
+#define ADC3_Read_PC1 11
+#define ADC3_Read_PC2 12
+#define ADC3_Read_PC3 13
+#define ADC3_Read_PF4 14
+#define ADC3_Read_PF5 15
+
 #define ADC_12Bit 0UL
 #define ADC_10Bit 1UL
 #define ADC_8Bit 2UL
@@ -354,21 +462,23 @@ Channel	ADC1	ADC2	ADC3
 1				PA1		PA1		PA1
 2				PA2		PA2		PA2
 3				PA3		PA3		PA3
-4				PA4		PA4	
-5				PA5		PA5	
-6				PA6		PA6	
-7				PA7		PA7	
-8				PB0		PB0	
-9				PB1		PB1	
+4				PA4		PA4		PF6
+5				PA5		PA5		PF7
+6				PA6		PA6		PF8
+7				PA7		PA7		PF9
+8				PB0		PB0		PF10
+9				PB1		PB1		PF3
 10			PC0		PC0		PC0
 11			PC1		PC1		PC1
 12			PC2		PC2		PC2
 13			PC3		PC3		PC3
-14			PC4		PC4	
-15			PC5		PC5	
+14			PC4		PC4		PF4
+15			PC5		PC5		PF5
 16			temperature sensor		
 17			VREFINT		
 18			VBAT/2
+
+Channel example, to setup ADC1 PA0 and ADC2 PA1, use: ADC1_PA0 | ADC2_PA1
 
 resolution is common to all ADCs
 the less bits the faster the sampling time
@@ -393,6 +503,7 @@ void InitADC1(unsigned int channels, unsigned int resolution, unsigned int Sampl
 void InitADC2(unsigned int channels, unsigned int resolution, unsigned int SamplingTime);	//each bit represents a channel, LSB=channel 0
 void InitADC3(unsigned int channels, unsigned int resolution, unsigned int SamplingTime);	//each bit represents a channel, LSB=channel 0
 
+//Read channel must be in the form of ADC1_Read_PA0
 unsigned int ReadADC1(unsigned int channel);
 unsigned int ReadADC2(unsigned int channel);
 unsigned int ReadADC3(unsigned int channel);

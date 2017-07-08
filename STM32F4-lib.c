@@ -1150,10 +1150,18 @@ void InitADC3(unsigned int channels, unsigned int resolution, unsigned int Sampl
 	if((channels & 1UL<<1)!=0){ ConfigPortA("---- ----  ---- --a-"); }
 	if((channels & 1UL<<2)!=0){ ConfigPortA("---- ----  ---- -a--"); }
 	if((channels & 1UL<<3)!=0){ ConfigPortA("---- ----  ---- a---"); }
+	if((channels & 1UL<<4)!=0){ ConfigPortF("---- ----  -a-- ----"); }
+	if((channels & 1UL<<5)!=0){ ConfigPortF("---- ----  a--- ----"); }
+	if((channels & 1UL<<6)!=0){ ConfigPortF("---- ---a  ---- ----"); }
+	if((channels & 1UL<<7)!=0){ ConfigPortF("---- --a-  ---- ----"); }
+	if((channels & 1UL<<8)!=0){ ConfigPortF("---- -a--  ---- ----"); }
+	if((channels & 1UL<<9)!=0){ ConfigPortF("---- ----  ---- a---"); }
 	if((channels & 1UL<<10)!=0){ ConfigPortC("---- ----  ---- ---a"); }
 	if((channels & 1UL<<11)!=0){ ConfigPortC("---- ----  ---- --a-"); }
 	if((channels & 1UL<<12)!=0){ ConfigPortC("---- ----  ---- -a--"); }
 	if((channels & 1UL<<13)!=0){ ConfigPortC("---- ----  ---- a---"); }
+	if((channels & 1UL<<14)!=0){ ConfigPortF("---- ----  ---a ----"); }
+	if((channels & 1UL<<15)!=0){ ConfigPortF("---- ----  --a- ----"); }
 
 	APBfreq=GetAPB2Freq();
 	for(i=0;i<=3;i++)
