@@ -2402,7 +2402,7 @@ unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, uns
 	return x1+x+1;
 }
 
-void PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
+unsigned short PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
 {
 	char buff[256];
 	unsigned int i=0;
@@ -2419,5 +2419,7 @@ void PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const ch
 	}while(buff[i]!=0);
 	
 	va_end(args);
+	
+	return x1;
 }
 
