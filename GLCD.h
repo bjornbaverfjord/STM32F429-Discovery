@@ -13,6 +13,11 @@
 //fonts
 #define LCDFontVariableWidth 0
 #define LCDFont7x11 1
+#define LCDFont8x8 2
+#define LCDFont8x12 3
+#define LCDFont12x12 4
+#define LCDFont16x24 5
+#define LCDFontHebrew 6
 
 
 /*
@@ -134,55 +139,17 @@ void WaitForHSyncGLCD(void);
 void TranslateXYGLCD(int *x, int *y);
 
 //text
-//available fonts: LCDFontVariableWidth, LCDFont7x11
-unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, unsigned int colour);
-unsigned short PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );
-
-
-//7x11 font functions
 //these functions return the x of where the next character would go (assuming a 1 pixel gap)
-unsigned short PrintCharGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short colour);		//char, x, y, 16 bit colour (prints a character with its top left at x,y)
-unsigned short PrintStringGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short colour);	//string, x, y, 16 bit colour, returns finishing x+1 (30x29 chars/screen using 7x11 characters)
-unsigned int PrintStringWrappedGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short xmax, unsigned short colour);//string, x, y, xmax, 16 bit colour (xmax is the right hand limit for the text, returns (y<<16) | x of where the next character would go)
-unsigned short PrintValueGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a variable as decimal)
-unsigned short PrintValueOf3GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a variable as decimal)
-unsigned short PrintValue2DigitsGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a variable as decimal)
-unsigned short PrintFloatGLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short colour);	//value, digits to show, x, y, 16 bit colour (prints a value as floating point (xx.yy)) 
-unsigned short PrintHexGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a 32 bit variable as hex)
-unsigned short PrintHexOf2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a 32 bit variable as hex)
-unsigned short PrintHexByteGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a byte variable as hex)
-unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a variable as binary)
-unsigned short PrintBinOf4GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a variable as binary)
-unsigned short GetStringWidthGLCD(char string[]);													//given a string, returns the number of pixels in width (without the ending space)
-
-unsigned short PrintCharWithBGGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//char, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a character with its top left at x,y)
-unsigned short PrintStringWithBGGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);	//string, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour. returns finishing x+1 (30x29 chars/screen using 7x11 characters)
-unsigned short PrintValueWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a variable as decimal)
-unsigned short PrintValue2DigitsWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);	//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit colour, background colour (prints a variable as decimal)
-unsigned short PrintFloatWithBGGLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);	//value, digits to show, x, y, fillmode must be FillBack or FillToEdge. background colour (prints a value as floating point (xx.yy)) 
-unsigned short PrintHexWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);			//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a 32 bit variable as hex)
-unsigned short PrintHexByteWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a byte variable as hex)
-unsigned short PrintBinWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);			//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a variable as binary)
-
-//8x1-9 variable width font functions
-//these functions return the x of where the next character would go (assuming a 1 pixel gap)
-unsigned short PrintChar2GLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short colour);		//character, x, y, 16 bit colour (8 x 1-9 variable width font, returns the width of each character, this font is very small)
-unsigned short GetStringWidth2GLCD(char string[]);													//given a string, returns the number of pixels in width (without the ending space)
-unsigned short PrintString2GLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short colour);	//string, x, y, 16 bit colour, returns finishing x+1 (8 x 1-9 variable width, this font is very small)
-unsigned int PrintStringWrapped2GLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short xmax, unsigned short colour);//string, x, y, xmax, 16 bit colour (xmax is the right hand limit for the text, returns (y<<16) | x of where the next character would go)
-unsigned short PrintValue2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a variable as decimal)
-unsigned short PrintFloat2GLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short colour);//value, digits to show, x, y, 16 bit colour (prints a value as floating point (xx.yy)) 
-unsigned short PrintHex2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a 32 bit variable as hex)
-unsigned short PrintHexByte2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);		//value, x, y, 16 bit colour (prints a byte variable as hex)
-unsigned short PrintBin2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour);			//value, x, y, 16 bit colour (prints a variable as binary
-
-unsigned short PrintChar2WithBGGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//char, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a character with its top left at x,y)
-unsigned short PrintString2WithBGGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);	//string, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour. returns finishing x+1 (30x29 chars/screen using 7x11 characters)
-unsigned short PrintValue2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a variable as decimal)
-unsigned short PrintFloat2WithBGGLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);	//value, digits to show, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a value as floating point (xx.yy)) 
-unsigned short PrintHex2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);			//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a 32 bit variable as hex)
-unsigned short PrintHexByte2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);		//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a byte variable as hex)
-unsigned short PrintBin2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour);			//value, x, y, fillmode must be FillBack or FillToEdge. 16 bit text colour, background colour (prints a variable as binary)
+//available fonts: LCDFontVariableWidth, LCDFont7x11, LCDFont8x8, LCDFont8x12, LCDFont12x12, LCDFont16x24, LCDFontHebrew
+//use -1 for BackColour if you want a transparant background
+unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour);
+unsigned short PrintfGLCD(int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour, const char * format, ... );	//note: if using this with hebrew, create a string by char str[]={HEB_aleph, HEB_bet, HEB_gimel, HEB_dalet, 0}; it will display in reverse order
+unsigned int PrintStringWrappedGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short xmax, unsigned int font, unsigned int TextColour, int BackColour);	//string, x, y, xmax, font, text colour, back colour (xmax is the right hand limit for the text, returns (y<<16) | x of where the next character would go)
+unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned int font, unsigned int TextColour, int BackColour);			//value, x, y, 16 bit colour (prints a variable as binary)
+unsigned int GetFontHeight(unsigned int font);
+unsigned int GetFontWidth(unsigned int font);
+unsigned int GetStringWidthGLCD(char string[], unsigned int font);
+unsigned int GetCharacterWidthGLCD(char chr, unsigned int font);
 
 //7 segment
 unsigned short PrintValueSevSegGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short height, unsigned short thickness, unsigned short gap, unsigned short colour);	//value, x, y, height, thickness, gap, colour

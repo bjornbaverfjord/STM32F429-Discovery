@@ -5,140 +5,9 @@
 #include <limits.h>
 #include "STM32F4-lib.h"
 #include <stdarg.h>
+#include "fonttables.h"
 
 struct GraphicsType Graphics;
-
-/******************************************************
- *              Font 7x11(English)                    *
- * -ASCII fonts from 0x20 ~ 0x7F(DEC 32 ~ 126)     	  *
- *   bits 5 (bottom) to 15 (top) in the y direction   *
- *	      7 words=7 lines in the x direction		  *
- ******************************************************/
-const unsigned short ascii_7x11[95][14] = {                                                       
-	{0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x001F}, //0x0020 space
-	{0x0000, 0x07C0, 0xDFE0, 0xDFE0, 0x07C0, 0x0000, 0x001F}, //0x0021 !
-	{0x0000, 0x00E0, 0x00E0, 0x0000, 0x00E0, 0x00E0, 0x001F}, //0x0022 "
-	{0x0000, 0x1B00, 0x7FC0, 0x1B00, 0x7FC0, 0x1B00, 0x001F}, //0x0023 #
-	{0x1300, 0x2780, 0x2480, 0x7FC0, 0x2480, 0x3880, 0x191F}, //0x0024 $
-	{0x3080, 0x1940, 0x2D40, 0x5680, 0x5300, 0x2180, 0x001F}, //0x0025 %
-	{0x3800, 0x7D80, 0x47C0, 0x5E40, 0x7BC0, 0x2180, 0x581F}, //0x0026 &
-	{0x0000, 0x0000, 0x00E0, 0x00E0, 0x0000, 0x0000, 0x001F}, //0x0027 '
-	{0x0000, 0x0000, 0x3F80, 0x7FC0, 0xC060, 0x8020, 0x001F}, //0x0028 (
-	{0x0000, 0x8020, 0xC060, 0x7FC0, 0x3F80, 0x0000, 0x001F}, //0x0029 )
-	{0x0000, 0x2480, 0x3F80, 0x0E00, 0x3F80, 0x2480, 0x001F}, //0x002A *
-	{0x0400, 0x0400, 0x1F00, 0x1F00, 0x0400, 0x0400, 0x001F}, //0x002B +
-	{0x0000, 0x8000, 0xE000, 0x6000, 0x0000, 0x0000, 0x001F}, //0x002C ,
-	{0x0400, 0x0400, 0x0400, 0x0400, 0x0400, 0x0400, 0x001F}, //0x002D -
-	{0x0000, 0x0000, 0xC000, 0xC000, 0x0000, 0x0000, 0x001F}, //0x002E .
-	{0xC000, 0xF000, 0x3C00, 0x0F00, 0x03C0, 0x00E0, 0x003F}, //0x002F /
-	{0x7FC0, 0xFFE0, 0x8020, 0x8020, 0x8020, 0xFFE0, 0x7FDF}, //0x0030 0
-	{0x0000, 0x8080, 0x80C0, 0xFFE0, 0xFFE0, 0x8000, 0x001F}, //0x0031 1
-	{0xE0C0, 0xF0E0, 0x9820, 0x8C20, 0x8420, 0x87E0, 0x83DF}, //0x0032 2
-	{0x60C0, 0xE0E0, 0x8420, 0x8420, 0x8420, 0xFFE0, 0x7BDF}, //0x0033 3
-	{0x3800, 0x3E00, 0x2780, 0x21E0, 0xFFE0, 0xFFE0, 0x201F}, //0x0034 4
-	{0x83E0, 0x83E0, 0x8220, 0x8220, 0xC220, 0x7E20, 0x3C3F}, //0x0035 5
-	{0x7F00, 0xFFC0, 0x8260, 0x8220, 0x8220, 0xFE20, 0x7C3F}, //0x0036 6
-	{0x0020, 0x0020, 0xE020, 0xFC20, 0x1F20, 0x03E0, 0x00FF}, //0x0037 7
-	{0x7BC0, 0xFFE0, 0x8620, 0x8620, 0x8C20, 0xFFE0, 0x7BDF}, //0x0038 8
-	{0x03C0, 0x87E0, 0x8420, 0xC420, 0x6420, 0x3FE0, 0x1FDF}, //0x0039 9
-	{0x0000, 0x0000, 0x3180, 0x3180, 0x3180, 0x0000, 0x001F}, //0x003A :
-	{0x0000, 0x0000, 0xB180, 0xF180, 0x7180, 0x0000, 0x001F}, //0x003B ;
-	{0x0400, 0x0E00, 0x1B00, 0x3180, 0x60C0, 0xC060, 0x803F}, //0x003C <
-	{0x0A00, 0x0A00, 0x0A00, 0x0A00, 0x0A00, 0x0A00, 0x0A1F}, //0x003D =
-	{0x8020, 0xC060, 0x60C0, 0x3180, 0x1B00, 0x0E00, 0x041F}, //0x003E >
-	{0x01C0, 0x01E0, 0x0020, 0xD820, 0xDC20, 0x07E0, 0x03DF}, //0x003F ?
-	{0x7F40, 0x8320, 0x8320, 0xFF20, 0x8060, 0xFFE0, 0x7FDF}, //0x0040 @
-	{0xFF00, 0xFF80, 0x08C0, 0x0860, 0x08C0, 0xFF80, 0xFF1F}, //0x0041 A
-	{0xFFE0, 0xFFE0, 0x8420, 0x8420, 0x8420, 0xFFE0, 0x7BDF}, //0x0042 B
-	{0x7FC0, 0xFFE0, 0x8020, 0x8020, 0x8020, 0xE0E0, 0x60DF}, //0x0043 C
-	{0xFFE0, 0xFFE0, 0x8020, 0x8020, 0xC060, 0x7FC0, 0x3F9F}, //0x0044 D
-	{0xFFE0, 0xFFE0, 0x8420, 0x8420, 0x8420, 0x8420, 0x803F}, //0x0045 E
-	{0xFFE0, 0xFFE0, 0x0420, 0x0420, 0x0420, 0x0420, 0x003F}, //0x0046 F
-	{0x7FC0, 0xFFE0, 0x8020, 0x8020, 0x8820, 0xF8E0, 0xF8DF}, //0x0047 G
-	{0xFFE0, 0xFFE0, 0x0400, 0x0400, 0x0400, 0xFFE0, 0xFFFF}, //0x0048 H
-	{0x0000, 0x8020, 0xFFE0, 0xFFE0, 0x8020, 0x0000, 0x001F}, //0x0049 I
-	{0x6000, 0xE000, 0x8000, 0x8000, 0x8000, 0xFFE0, 0x7FFF}, //0x004A J
-	{0xFFE0, 0xFFE0, 0x0400, 0x1F00, 0x7BC0, 0xE0E0, 0x803F}, //0x004B K
-	{0xFFE0, 0xFFE0, 0x8000, 0x8000, 0x8000, 0x8000, 0x801F}, //0x004C L
-	{0xFFE0, 0xFFE0, 0x0080, 0x0700, 0x0080, 0xFFE0, 0xFFFF}, //0x004D M
-	{0xFFE0, 0xFFE0, 0x0380, 0x0E00, 0x3800, 0xFFE0, 0xFFFF}, //0x004E N
-	{0x7FC0, 0xFFE0, 0x8020, 0x8020, 0x8020, 0xFFE0, 0x7FDF}, //0x004F O
-	{0xFFE0, 0xFFE0, 0x0420, 0x0420, 0x0420, 0x07E0, 0x03DF}, //0x0050 P
-	{0x7FC0, 0xFFE0, 0x9020, 0xB020, 0xE020, 0x7FE0, 0xFFDF}, //0x0051 Q
-	{0xFFE0, 0xFFE0, 0x0420, 0x0420, 0x0C20, 0xFFE0, 0xF3DF}, //0x0052 R
-	{0x43C0, 0xC7E0, 0x8620, 0x8420, 0x8C20, 0xFC60, 0x785F}, //0x0053 S
-	{0x0020, 0x0020, 0xFFE0, 0xFFE0, 0x0020, 0x0020, 0x001F}, //0x0054 T
-	{0x7FE0, 0xFFE0, 0x8000, 0x8000, 0x8000, 0xFFE0, 0x7FFF}, //0x0055 U
-	{0x1FE0, 0x3FE0, 0x6000, 0xC000, 0x6000, 0x3FE0, 0x1FFF}, //0x0056 V
-	{0x1FE0, 0xFFE0, 0xE000, 0x1C00, 0xE000, 0xFFE0, 0x1FFF}, //0x0057 W
-	{0xC060, 0xF1E0, 0x3F80, 0x0E00, 0x3F80, 0xF1E0, 0xC07F}, //0x0058 X
-	{0x03E0, 0x07E0, 0xFC00, 0xFC00, 0x07E0, 0x03E0, 0x001F}, //0x0059 Y
-	{0xC020, 0xF020, 0xBC20, 0x8F20, 0x83A0, 0x80E0, 0x807F}, //0x005A Z
-	{0x0000, 0xFFE0, 0xFFE0, 0x8020, 0x8020, 0x8020, 0x001F}, //0x005B [
-	{0x0020, 0x00E0, 0x03C0, 0x0F00, 0x3C00, 0xF000, 0xC01F}, //0x005C '\'
-	{0x0000, 0x8020, 0x8020, 0x8020, 0xFFE0, 0xFFE0, 0x001F}, //0x005D ]
-	{0x0080, 0x00C0, 0x0060, 0x0060, 0x00C0, 0x0080, 0x001F}, //0x005E ^
-	{0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x801F}, //0x005F _
-	{0x0000, 0x0000, 0x0020, 0x0060, 0x00E0, 0x0080, 0x001F}, //0x0060 `
-	{0x7000, 0xF900, 0x8900, 0x8900, 0x8900, 0xFF00, 0xFE1F}, //0x0061 a
-	{0xFFE0, 0xFFE0, 0x8100, 0x8100, 0x8100, 0xFF00, 0x7E1F}, //0x0062 b
-	{0x7E00, 0xFF00, 0x8100, 0x8100, 0x8100, 0xC300, 0x421F}, //0x0063 c
-	{0x7E00, 0xFF00, 0x8100, 0x8100, 0x8100, 0xFFE0, 0xFFFF}, //0x0064 d
-	{0x7E00, 0xFF00, 0x9100, 0x9100, 0x9100, 0x9F00, 0x5E1F}, //0x0065 e
-	{0x0400, 0xFFC0, 0xFFE0, 0x0420, 0x0420, 0x0420, 0x001F}, //0x0066 f
-	{0x9E00, 0xBF00, 0xA100, 0xA100, 0xA100, 0xFF00, 0x7F1F}, //0x0067 g
-	{0xFFE0, 0xFFE0, 0x0100, 0x0100, 0x0100, 0xFF00, 0xFE1F}, //0x0068 h
-	{0x8100, 0x8100, 0xFF60, 0xFF60, 0x8000, 0x8000, 0x001F}, //0x0069 i
-	{0x8000, 0x8100, 0x8100, 0x8100, 0xFF60, 0x7F60, 0x001F}, //0x006A j
-	{0xFFE0, 0xFFE0, 0x1800, 0x3C00, 0x6600, 0xC300, 0xC11F}, //0x006B k
-	{0x8020, 0x8020, 0xFFE0, 0xFFE0, 0x8000, 0x8000, 0x001F}, //0x006C l
-	{0xFF00, 0xFF00, 0x0100, 0x3F00, 0x0100, 0xFF00, 0xFE1F}, //0x006D m
-	{0xFF00, 0xFF00, 0x0100, 0x0100, 0x0100, 0xFF00, 0xFE1F}, //0x006E n
-	{0x7E00, 0xFF00, 0x8100, 0x8100, 0x8100, 0xFF00, 0x7E1F}, //0x006F o
-	{0xFF00, 0xFF00, 0x2100, 0x2100, 0x2100, 0x3F00, 0x1E1F}, //0x0070 p
-	{0x1E00, 0x3F00, 0x2100, 0x2100, 0x2100, 0xFF00, 0xFE1F}, //0x0071 q
-	{0x0100, 0xFF00, 0xFF00, 0x0400, 0x0200, 0x0300, 0x031F}, //0x0072 r
-	{0x8E00, 0x9F00, 0x9900, 0x9900, 0x9900, 0xF900, 0x711F}, //0x0073 s
-	{0x0100, 0x0100, 0x7FC0, 0xFFC0, 0x8100, 0x8100, 0x811F}, //0x0074 t
-	{0x7F00, 0xFF00, 0x8000, 0x8000, 0x8000, 0xFF00, 0xFF1F}, //0x0075 u
-	{0x1F00, 0x3F00, 0x6000, 0xC000, 0x6000, 0x3F00, 0x1F1F}, //0x0076 v
-	{0x3F00, 0xFF00, 0xC000, 0x3C00, 0xC000, 0xFF00, 0x3F1F}, //0x0077 w
-	{0xE300, 0xF700, 0x1C00, 0x1C00, 0x1C00, 0xF700, 0xE31F}, //0x0078 x
-	{0x8F00, 0x9F00, 0x9000, 0x9000, 0x9000, 0xFF00, 0x7F1F}, //0x0079 y
-	{0xC100, 0xE100, 0xB100, 0x9900, 0x8D00, 0x8700, 0x831F}, //0x007A z
-	{0x0000, 0x0400, 0x7FC0, 0xE0E0, 0x8020, 0x8000, 0x001F}, //0x007B {
-	{0x0000, 0x0000, 0xFFE0, 0xFFE0, 0x0000, 0x0000, 0x001F}, //0x007C |
-	{0x0000, 0x8020, 0xE0E0, 0x7FC0, 0x0400, 0x0000, 0x005F}, //0x007D }
-	{0x0060, 0x0020, 0x0060, 0x00C0, 0x0080, 0x00C0, 0x005F}  //0x007E ~
-};
-
-//details on pxldata table:
-//0 to 94 (character start index, 32d to 126d ascii)
-//95 to 189 (bytes per character)
-//190 to 558 (character graphics bytes)
-const unsigned int ascii2[559]={190, 191, 192, 195, 201, 205, 211, 215, 216, 218, 220, 223, 228, 230, 233, 234, 237, 241, 243, 247, 251,
-256, 260, 264, 268, 272, 276, 277, 279, 283, 287, 291, 295, 303, 310, 314, 319, 324, 328, 332, 337, 342,
-343, 347, 352, 356, 363, 368, 373, 378, 383, 388, 392, 397, 402, 409, 418, 424, 429, 433, 435, 438, 440,
-445, 450, 452, 456, 460, 464, 468, 472, 474, 478, 482, 483, 484, 488, 489, 496, 500, 504, 508, 512, 514,
-518, 520, 524, 529, 536, 540, 544, 548, 551, 552, 555, 1, 1, 3, 6, 4, 6, 4, 1, 2, 2, 3, 5, 2, 3, 1, 3, 4,
-2, 4, 4, 5, 4, 4, 4, 4, 4, 1, 2, 4, 4, 4, 4, 8, 7, 4, 5, 5, 4, 4, 5, 5, 1, 4, 5, 4, 7, 5, 5, 5, 5, 5, 4,
-5, 5, 7, 9, 6, 5, 4, 2, 3, 2, 5, 5, 2, 4, 4, 4, 4, 4, 2, 4, 4, 1, 1, 4, 1, 7, 4, 4, 4, 4, 2, 4, 2, 4, 5,
-7, 4, 4, 4, 3, 1, 3, 4, 0, 95, 3, 0, 3, 20, 124, 23, 116, 31, 20, 36, 122, 47, 18, 66, 37, 26, 36, 82, 33,
-54, 73, 118, 80, 3, 126, 129, 129, 126, 5, 2, 5, 4, 4, 31, 4, 4, 64, 32, 8, 8, 8, 64, 96, 28, 3, 62, 65,
-65, 62, 2, 127, 98, 81, 73, 70, 34, 65, 73, 54, 24, 20, 18, 127, 16, 39, 69, 69, 57, 62, 73, 73, 50, 1, 97,
-29, 3, 54, 73, 73, 54, 38, 73, 73, 62, 34, 64, 34, 8, 20, 20, 34, 20, 20, 20, 20, 34, 20, 20, 8, 2, 1, 89,
-6, 60, 66, 153, 165, 165, 189, 162, 28, 96, 24, 22, 17, 22, 24, 96, 127, 73, 73, 54, 62, 65, 65, 65, 34,
-127, 65, 65, 34, 28, 127, 73, 73, 73, 127, 9, 9, 9, 62, 65, 65, 73, 122, 127, 8, 8, 8, 127, 127, 32, 64,
-64, 63, 127, 8, 20, 34, 65, 127, 64, 64, 64, 127, 4, 24, 32, 24, 4, 127, 127, 6, 8, 48, 127, 62, 65, 65,
-65, 62, 127, 9, 9, 9, 6, 62, 65, 65, 97, 190, 127, 9, 9, 25, 102, 38, 73, 73, 50, 1, 1, 127, 1, 1, 63, 64,
-64, 64, 63, 3, 12, 48, 64, 48, 12, 3, 3, 12, 112, 12, 3, 12, 112, 12, 3, 65, 34, 28, 28, 34, 65, 3, 4, 120,
-4, 3, 97, 89, 69, 67, 255, 129, 3, 28, 96, 129, 255, 4, 2, 1, 2, 4, 64, 64, 64, 64, 64, 1, 2, 36, 84, 84,
-120, 127, 68, 68, 56, 56, 68, 68, 40, 56, 68, 68, 127, 56, 84, 84, 88, 126, 5, 156, 162, 162, 126, 127, 4,
-4, 120, 125, 253, 127, 16, 40, 68, 127, 124, 4, 4, 124, 4, 4, 120, 124, 4, 4, 120, 56, 68, 68, 56, 254, 34,
-34, 28, 28, 34, 34, 254, 124, 4, 72, 84, 84, 36, 126, 68, 60, 64, 64, 124, 12, 48, 64, 48, 12, 28, 96, 16,
-12, 16, 96, 28, 108, 16, 16, 108, 142, 112, 16, 14, 100, 84, 84, 76, 8, 54, 65, 255, 65, 54, 8, 2, 1, 2, 1};
-
-
 static unsigned int DrawAddress;
 static unsigned int LCDDirection, GLCDWidth, GLCDHeight;
 
@@ -296,56 +165,53 @@ void TriangleFilledGLCD(int x1, int y1, int x2, int y2, int x3, int y3, unsigned
 	PolygonConvexFilledGLCD(points,3,colour);
 }
 
-
-unsigned short PrintCharGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short colour)
+unsigned int GetFontHeight(unsigned int font)
 {
-	unsigned int x;
-	unsigned int y;
-	
-	for(x=0;x<7;x++)
+	switch(font)
 	{
-		for(y=5;y<16;y++)
-		{
-			if((ascii_7x11[chr-0x20][x]>>y) & 1)
-			{
-				SetPixelGLCD(xpos+x,ypos+y-5,colour);
-			}
-		}
+		case LCDFontVariableWidth:
+			return 8;
+		case LCDFont7x11:
+			return 11;
+		case LCDFont8x8:
+			return 8;
+		case LCDFont8x12:
+			return 12;
+		case LCDFont12x12:
+			return 12;
+		case LCDFont16x24:
+			return 24;
+		case LCDFontHebrew:
+			return 16;
 	}
 	
-	return xpos+8;
+	return 0;
 }
 
-
-unsigned short PrintStringGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short colour)	//30x29 chars/screen 7x11 font
+unsigned int GetFontWidth(unsigned int font)
 {
-	unsigned int i = 0;
-
-	while (string[i] != 0)
+	switch(font)
 	{
-		PrintCharGLCD(string[i],xpos,ypos,colour);
-		xpos += 8;	//1 pixel gap between chars
-		i += 1;
+		case LCDFontVariableWidth:
+			return 9;	//widest letter
+		case LCDFont7x11:
+			return 7;
+		case LCDFont8x8:
+			return 8;
+		case LCDFont8x12:
+			return 8;
+		case LCDFont12x12:
+			return 12;
+		case LCDFont16x24:
+			return 16;
+		case LCDFontHebrew:
+			return 8;	//widest letter
 	}
 
-	return xpos;
+	return 0;
 }
 
-
-unsigned short GetStringWidthGLCD(char string[])
-{
-	unsigned int i=0;	
-
-	do
-	{
-		i++;
-	}while(string[i]!=0);
-
-	return (i*8)-1;
-}
-
-
-unsigned int PrintStringWrappedGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short xmax, unsigned short colour)	//30x29 chars/screen 7x11 font
+unsigned int PrintStringWrappedGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short xmax, unsigned int font, unsigned int TextColour, int BackColour)	//30x29 chars/screen 7x11 font
 {
 	unsigned short i = 0, substrcnt=0, stringwidth, printcntr, xpos2, atend, spacecounter=0;
 	char substring[512];
@@ -368,39 +234,39 @@ unsigned int PrintStringWrappedGLCD(char string[], unsigned short xpos, unsigned
 			}
 			substring[substrcnt]=0;	//add terminating character
 			if(string[i]==0){ atend=1; }
-			stringwidth=GetStringWidthGLCD(substring);
+			stringwidth=GetStringWidthGLCD(substring,font);
 
 			if((xpos+stringwidth)<=xmax)	//if the word fits on the current line
 			{
-				xpos=PrintStringGLCD(substring,xpos,ypos,colour);	//print the word
+				xpos=PrintfGLCD(xpos,ypos,TextColour,BackColour,font,substring);	//print the word
 			}else
 			{
-				ypos+=12;	//word doesn't fit, print it on a new line
+				ypos+=GetFontHeight(font)+1;	//word doesn't fit, print it on a new line
 				xpos=xpos2;
 				//print the word character by character incase its longer than 1 line
 				printcntr=0;
 				while (substring[printcntr] != 0)
 				{
-					if((xpos+7)>xmax){ ypos+=12; xpos=xpos2; }	//word doesnt fit, continue remainder of word on new line
-					xpos=PrintCharGLCD(substring[printcntr],xpos,ypos,colour);
+					if((xpos+GetCharacterWidthGLCD(substring[printcntr],font))>xmax){ ypos+=GetFontHeight(font)+1; xpos=xpos2; }	//word doesnt fit, continue remainder of word on new line
+					xpos=BmpCharacter(substring[printcntr],xpos,ypos,font,TextColour,BackColour);
 					printcntr++;
 				}
 			}
 		}else	//if a space
 		{
-			if((xpos+7)>xmax){ ypos+=12; xpos=xpos2; }	//if previous word ended at edge of screen, go to next line
+			if((xpos+GetCharacterWidthGLCD(' ',font))>xmax){ ypos+=GetFontHeight(font)+1; xpos=xpos2; }	//if previous word ended at edge of screen, go to next line
 			if(xpos==xpos2)	//if at the start of a line, ignore the first space
 			{
 				spacecounter++;
 				if(spacecounter>1)	//if more then 1 space
 				{
-					xpos=PrintCharGLCD(' ',xpos, ypos, colour);	//print space (at the start of the line)
+					xpos=BmpCharacter(' ',xpos,ypos,font,TextColour,BackColour);	//print space (at the start of the line)
 				}
 			}else	//not at the start of the line
 			{
 				//print space (while not at the start of the line)
-				if((xpos+7)>xmax){ ypos+=12; xpos=xpos2; }	//space will go over edge of screen, put it on the next line
-				xpos=PrintCharGLCD(' ',xpos, ypos, colour);
+				if((xpos+GetCharacterWidthGLCD(' ',font))>xmax){ ypos+=GetFontHeight(font)+1; xpos=xpos2; }	//space will go over edge of screen, put it on the next line
+				xpos=BmpCharacter(' ',xpos,ypos,font,TextColour,BackColour);
 			}
 			
 			i++;
@@ -412,724 +278,12 @@ unsigned int PrintStringWrappedGLCD(char string[], unsigned short xpos, unsigned
 	return (ypos<<16) | xpos;
 }
 
-
-unsigned short PrintValueGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	unit = 1000000000;
-	print = 0;
-
-	for(digit=10;digit>=1;digit--)
-	{
-		digitval = val/unit;
-		val -= digitval*unit;
-		if ((digitval > 0) || (digit==1)) print = 1;
-		if (print == 1) xpos = PrintCharGLCD(digitval + '0', xpos ,ypos, colour);
-		unit /= 10;
-	}
-
-	return xpos;
-}
-
-unsigned short PrintValueOf3GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	unit = 1000000000;
-	print = 0;
-
-	for(digit=10;digit>=1;digit--)
-	{
-		digitval = val / unit;
-		val -= digitval * unit;
-		if ((digitval > 0) || (digit==1)) print = 1;
-		if (print == 1) {
-			xpos = PrintCharGLCD(digitval + '0', xpos, ypos, colour);
-			if ((digit % 3) == 1) xpos += 4;
-		}
-		unit /= 10;
-	}
-
-	return xpos;
-}
-
-
-
-
-unsigned short PrintValue2DigitsGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	unsigned int tens, units;
-
-	tens=val/10;
-	units=val-(tens*10);
-	xpos=PrintCharGLCD(tens+'0', xpos ,ypos, colour);
-	xpos=PrintCharGLCD(units+'0', xpos ,ypos, colour);
-
-	return xpos;
-}
-
-unsigned short PrintFloatGLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	unsigned char str[50], len[2], format[6];
-	
-	sprintf((char *)len, "%d", decimals);
-	format[0]='%'; format[1]='.'; format[2]=len[0];
-	if(decimals<10)
-	{
-		format[3]='f';
-		format[4]=0;	//string terminator
-	}else
-	{
-		format[3]=len[1];
-		format[4]='f';
-		format[5]=0;	//string terminator
-	}
-	snprintf((char *)str,50,(const char *)format,val);
-	xpos=PrintStringGLCD((char *)str, xpos, ypos, colour);
-
-	return xpos;
-}
-
-
-unsigned short PrintHexGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	
-	xpos=PrintCharGLCD('0', xpos, ypos, colour);
-	xpos=PrintCharGLCD('x', xpos, ypos, colour);
-	
-	for(i=28;i>=0;i-=4)
-	{
-		xpos=PrintCharGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-// Print hex in groups of 2 digits
-unsigned short PrintHexOf2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	
-	xpos = PrintCharGLCD('0', xpos, ypos, colour);
-	xpos = PrintCharGLCD('x', xpos, ypos, colour);
-	xpos += 4;
-	
-	for(i=28;i>=0;i-=4)
-	{
-		xpos=PrintCharGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, colour);
-		if ((i & 7) == 0) xpos += 4;
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHexByteGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	
-	for(i=4;i>=0;i-=4)
-	{
-		xpos=PrintCharGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
+unsigned short PrintBinGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned int font, unsigned int TextColour, int BackColour)
 {
 	int i;
 	for(i=31;i>=0;i--)
 	{
-		if(((val>>i) & 1)==1){ xpos=PrintCharGLCD('1', xpos, ypos, colour); }else{ xpos=PrintCharGLCD('0', xpos, ypos, colour); }
-	}
-
-	return xpos;
-}
-
-// Print int as binary in groups of 4 digits
-unsigned short PrintBinOf4GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	for(i=31;i>=0;i--)
-	{
-		if(((val>>i) & 1)==1){ xpos=PrintCharGLCD('1', xpos, ypos, colour); }else{ xpos=PrintCharGLCD('0', xpos, ypos, colour); }
-		if ((i & 3) == 0)  xpos += 4;
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintCharWithBGGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	unsigned int x;
-	unsigned int y;
-	
-	if(fillmode!=0){ RectangleFilledGLCD(xpos+7,ypos,GLCDWidth-1,ypos+10,BGcolour); }
-	for(x=0;x<7;x++)
-	{
-		for(y=5;y<16;y++)
-		{
-			if((ascii_7x11[chr-0x20][x]>>y) & 1){ SetPixelGLCD(xpos+x,ypos+y-5,colour); }else{ SetPixelGLCD(xpos+x,ypos+y-5,BGcolour); }
-		}
-	}
-
-	return xpos+8;
-}
-
-
-unsigned short PrintStringWithBGGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)	//30x29 chars/screen 7x11 font
-{
-	unsigned int i = 0;
-
-	if(fillmode==0)
-	{
-		while (string[i] != 0)
-		{
-			PrintCharWithBGGLCD(string[i],xpos,ypos,0,colour,BGcolour);
-			xpos += 8;	//1 pixel gap between chars
-			LineGLCD(xpos-1,ypos,xpos-1,ypos+10,BGcolour);
-			i += 1;
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintStringGLCD(string, xpos,ypos,colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintValueWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	if(fillmode==0)
-	{
-		unit=1000000000;
-		print=0;
-	
-		for(digit=10;digit>=1;digit--)
-		{
-			digitval=val/unit;
-			val -= digitval*unit;
-			if((digitval>0) || (digit==1)){ print=1; }
-			if(print==1){ xpos=PrintCharWithBGGLCD(digitval+'0', xpos ,ypos, 0, colour, BGcolour); }
-			unit /= 10;
-		}
-	
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintValueGLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintValue2DigitsWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	unsigned int tens, units;
-
-	tens=val/10;
-	units=val-(tens*10);
-	xpos=PrintCharWithBGGLCD(tens+'0', xpos ,ypos, fillmode, colour, BGcolour);
-	if(fillmode==0)
-	{
-		xpos=PrintCharWithBGGLCD(units+'0', xpos ,ypos, 0, colour, BGcolour);
-	}else
-	{
-		xpos=PrintCharGLCD(units+'0', xpos ,ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintFloatWithBGGLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	unsigned int ipart;
-	double fpart;
-	unsigned int i;
-	unsigned int decimal;
-	
-	if(fillmode==0)
-	{
-		ipart=(unsigned int)val;
-		xpos=PrintValueWithBGGLCD(ipart, xpos, ypos, 0, colour, BGcolour);
-		xpos=PrintCharWithBGGLCD('.', xpos, ypos, 0, colour, BGcolour);
-	
-		fpart=val-(float)ipart;
-		for(i=0;i<decimals;i++)
-		{
-			fpart *= 10.0;
-			decimal=(unsigned int)fpart;
-			if(decimal>9){ decimal=9; }
-			xpos=PrintCharWithBGGLCD('0'+decimal, xpos, ypos, 0, colour, BGcolour);
-			fpart -= (float)decimal;
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintFloatGLCD(val, decimals, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHexWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	int i;
-
-	if(fillmode==0)
-	{
-		xpos=PrintCharWithBGGLCD('0', xpos, ypos, 0, colour, BGcolour);
-		xpos=PrintCharWithBGGLCD('x', xpos, ypos, 0, colour, BGcolour);
-		
-		for(i=28;i>=0;i-=4)
-		{
-			xpos=PrintCharWithBGGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, 0, colour, BGcolour);
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintHexGLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHexByteWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	int i;
-	
-	if(fillmode==0)
-	{
-		for(i=4;i>=0;i-=4)
-		{
-			xpos=PrintCharWithBGGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, 0, colour, BGcolour);
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintHexByteGLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintBinWithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	int i;
-
-	if(fillmode==0)
-	{
-		for(i=31;i>=0;i--)
-		{
-			if(((val>>i) & 1)==1){ xpos=PrintCharWithBGGLCD('1', xpos, ypos, 0, colour, BGcolour); }else{ xpos=PrintCharWithBGGLCD('0', xpos, ypos, 0, colour, BGcolour); }
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintBinGLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintChar2GLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short colour)	//1-9 x 8 variable width font
-{
-	int x;
-	int y;
-	int bytenum;
-	
-	x=0;
-	for(bytenum=ascii2[chr-' '];bytenum<(ascii2[chr-' ']+ascii2[95+(chr-' ')]);bytenum++)
-	{
-		for(y=0;y<8;y++)	//add byte
-		{
-			if(((ascii2[bytenum]>>y) & 1)==1)
-			{
-				SetPixelGLCD(xpos+x,ypos+y,colour);
-			}
-		}
-		x+=1;
-	}
-	
-	return xpos+ascii2[95+(chr-' ')]+1;
-}
-
-
-unsigned short PrintString2GLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short colour)	//1-9 x 8 variable width font
-{
-	unsigned int i = 0;
-
-	while (string[i] != 0)
-	{
-		xpos=PrintChar2GLCD(string[i],xpos, ypos, colour);
-		i += 1;
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintChar2WithBGGLCD(char chr, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)	//1-9 x 8 variable width font
-{
-	int x;
-	int y;
-	int bytenum;
-
-	x=0;
-	for(bytenum=ascii2[chr-' '];bytenum<(ascii2[chr-' ']+ascii2[95+(chr-' ')]);bytenum++)
-	{
-		for(y=0;y<8;y++)	//add byte
-		{
-			if(((ascii2[bytenum]>>y) & 1)==1){ SetPixelGLCD(xpos+x,ypos+y,colour); }else{ SetPixelGLCD(xpos+x,ypos+y,BGcolour); }
-		}
-		x+=1;
-	}
-	if(fillmode!=0){ RectangleFilledGLCD(xpos+x,ypos,GLCDWidth-1,ypos+7,BGcolour); }
-
-	return xpos+x+1;
-}
-
-
-unsigned short PrintString2WithBGGLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)	//30x29 chars/screen 7x11 font
-{	
-	unsigned int i = 0;
-	
-	if(fillmode==0)
-	{
-		while (string[i] != 0)
-		{
-			xpos=PrintChar2WithBGGLCD(string[i],xpos,ypos,0,colour,BGcolour);
-			//xpos += 8;	//1 pixel gap between chars
-			LineGLCD(xpos-1,ypos,xpos-1,ypos+7,BGcolour);
-			i += 1;
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+7,BGcolour);
-		xpos=PrintString2GLCD(string, xpos,ypos,colour);
-	}
-	
-	return xpos;
-}
-
-
-unsigned short GetStringWidth2GLCD(char string[])
-{
-	unsigned int i=0, length=0;	
-
-	do
-	{
-		length+=ascii2[95+(string[i]-' ')];
-		length+=1;
-		i++;
-	}while(string[i]!=0);
-
-	return length-1;
-}
-
-
-unsigned int PrintStringWrapped2GLCD(char string[], unsigned short xpos, unsigned short ypos, unsigned short xmax, unsigned short colour)
-{
-	unsigned short i = 0, substrcnt=0, stringwidth, printcntr, xpos2, atend, spacecounter=0, charlength;
-	char substring[512];
-
-	xpos2=xpos;
-	
-	atend=0;
-	while(atend==0)
-	{
-		if(isWhiteSpace(string[i])==0)	//if a word
-		{
-			spacecounter=0;
-
-			substrcnt=0;
-			while(isWhiteSpace(string[i])==0)	//copy the word
-			{
-				substring[substrcnt]=string[i];
-				i++;
-				substrcnt++;
-			}
-			substring[substrcnt]=0;	//add terminating character
-			if(string[i]==0){ atend=1; }
-			stringwidth=GetStringWidth2GLCD(substring);
-
-			if((xpos+stringwidth)<=xmax)	//if the word fits on the current line
-			{
-				xpos=PrintString2GLCD(substring,xpos,ypos,colour);	//print the word
-			}else
-			{
-				ypos+=12;	//word doesn't fit, print it on a new line
-				xpos=xpos2;
-				//print the word character by character incase its longer than 1 line
-				printcntr=0;
-				while (substring[printcntr] != 0)
-				{
-					charlength=ascii2[95+(substring[printcntr]-' ')];
-					if((xpos+charlength)>xmax){ ypos+=9; xpos=xpos2; }	//word doesnt fit, continue remainder of word on new line
-					xpos=PrintChar2GLCD(substring[printcntr],xpos,ypos,colour);
-					printcntr++;
-				}
-			}
-		}else	//if a space
-		{
-			if((xpos+ascii2[95])>xmax){ ypos+=9; xpos=xpos2; }	//if previous word ended at edge of screen, go to next line
-			if(xpos==xpos2)	//if at the start of a line, ignore the first space
-			{
-				spacecounter++;
-				if(spacecounter>1)	//if more then 1 space
-				{
-					xpos=PrintChar2GLCD(' ',xpos, ypos, colour);	//print space (at the start of the line)
-				}
-			}else	//not at the start of the line
-			{
-				//print space (while not at the start of the line)
-				if((xpos+ascii2[95])>xmax){ ypos+=9; xpos=xpos2; }	//space will go over edge of screen, put it on the next line
-				xpos=PrintChar2GLCD(' ',xpos, ypos, colour);
-			}
-			
-			i++;
-			if(string[i]==0){ atend=1; }
-		}
-	}
-
-	if((xpos+7)>xmax){ ypos+=12; xpos=xpos2; }	//make sure return for next character fits
-	return (ypos<<16) | xpos;
-}
-
-
-unsigned short PrintValue2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	unit=1000000000;
-	print=0;
-
-	for(digit=10;digit>=1;digit--)
-	{
-		digitval=val/unit;
-		val -= digitval*unit;
-		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ xpos=PrintChar2GLCD(digitval+'0', xpos ,ypos, colour); }
-		unit /= 10;
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintFloat2GLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	unsigned int ipart;
-	double fpart;
-	unsigned int i;
-	unsigned int decimal;
-	
-	ipart=(unsigned int)val;
-	xpos=PrintValue2GLCD(ipart, xpos, ypos, colour);
-	xpos=PrintChar2GLCD('.', xpos, ypos, colour);
-
-	fpart=val-(float)ipart;
-	for(i=0;i<decimals;i++)
-	{
-		fpart *= 10.0;
-		decimal=(unsigned int)fpart;
-		if(decimal>9){ decimal=9; }
-		xpos=PrintChar2GLCD('0'+decimal, xpos, ypos, colour);
-		fpart -= (float)decimal;
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHex2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	
-	xpos=PrintChar2GLCD('0', xpos, ypos, colour);
-	xpos=PrintChar2GLCD('x', xpos, ypos, colour);
-	
-	for(i=28;i>=0;i-=4)
-	{
-		xpos=PrintChar2GLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHexByte2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	
-	for(i=4;i>=0;i-=4)
-	{
-		xpos=PrintChar2GLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintBin2GLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short colour)
-{
-	int i;
-	for(i=31;i>=0;i--)
-	{
-		if(((val>>i) & 1)==1){ xpos=PrintChar2GLCD('1', xpos, ypos, colour); }else{ xpos=PrintChar2GLCD('0', xpos, ypos, colour); }
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintValue2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	if(fillmode==0)
-	{
-		unit=1000000000;
-		print=0;
-	
-		for(digit=10;digit>=1;digit--)
-		{
-			digitval=val/unit;
-			val -= digitval*unit;
-			if((digitval>0) || (digit==1)){ print=1; }
-			if(print==1){ xpos=PrintChar2WithBGGLCD(digitval+'0', xpos ,ypos, 0, colour, BGcolour); }
-			unit /= 10;
-		}
-	
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+7,BGcolour);
-		xpos=PrintValueGLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintFloat2WithBGGLCD(double val, unsigned int decimals, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	unsigned int ipart;
-	double fpart;
-	unsigned int i;
-	unsigned int decimal;
-	
-	if(fillmode==0)
-	{
-		ipart=(unsigned int)val;
-		xpos=PrintValue2WithBGGLCD(ipart, xpos, ypos, 0, colour, BGcolour);
-		xpos=PrintChar2WithBGGLCD('.', xpos, ypos, 0, colour, BGcolour);
-	
-		fpart=val-(float)ipart;
-		for(i=0;i<decimals;i++)
-		{
-			fpart *= 10.0;
-			decimal=(unsigned int)fpart;
-			if(decimal>9){ decimal=9; }
-			xpos=PrintChar2WithBGGLCD('0'+decimal, xpos, ypos, 0, colour, BGcolour);
-			fpart -= (float)decimal;
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+7,BGcolour);
-		xpos=PrintFloat2GLCD(val, decimals, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHex2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	int i;
-
-	if(fillmode==0)
-	{
-		xpos=PrintChar2WithBGGLCD('0', xpos, ypos, 0, colour, BGcolour);
-		xpos=PrintChar2WithBGGLCD('x', xpos, ypos, 0, colour, BGcolour);
-		
-		for(i=28;i>=0;i-=4)
-		{
-			xpos=PrintChar2WithBGGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, 0, colour, BGcolour);
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+7,BGcolour);
-		xpos=PrintHex2GLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintHexByte2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	int i;
-	
-	if(fillmode==0)
-	{
-		for(i=4;i>=0;i-=4)
-		{
-			xpos=PrintChar2WithBGGLCD("0123456789ABCDEF"[(val>>i) & 0xF], xpos, ypos, 0, colour, BGcolour);
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+7,BGcolour);
-		xpos=PrintHexByte2GLCD(val, xpos, ypos, colour);
-	}
-
-	return xpos;
-}
-
-
-unsigned short PrintBin2WithBGGLCD(unsigned int val, unsigned short xpos, unsigned short ypos, unsigned short fillmode, unsigned short colour, unsigned short BGcolour)
-{
-	int i;
-
-	if(fillmode==0)
-	{
-		for(i=31;i>=0;i--)
-		{
-			if(((val>>i) & 1)==1){ xpos=PrintCharWithBGGLCD('1', xpos, ypos, 0, colour, BGcolour); }else{ xpos=PrintChar2WithBGGLCD('0', xpos, ypos, 0, colour, BGcolour); }
-		}
-	}else
-	{
-		RectangleFilledGLCD(xpos,ypos,GLCDWidth-1,ypos+10,BGcolour);
-		xpos=PrintBin2GLCD(val, xpos, ypos, colour);
+		if(((val>>i) & 1)==1){ xpos=BmpCharacter(xpos, ypos, font, TextColour, BackColour, '1'); }else{ xpos=BmpCharacter(xpos, ypos, font, TextColour, BackColour, '0'); }
 	}
 
 	return xpos;
@@ -1600,7 +754,7 @@ void DrawButtonGLCD(unsigned short x, unsigned short y, unsigned short width, un
 	LineGLCD(x,y+(height-1),x+(width-1),y+(height-1),ColourWordGLCD(80,80,80));
 	LineGLCD(x+(width-1)-1,y,x+(width-1)-1,y+(height-1),ColourWordGLCD(80,80,80));
 	LineGLCD(x+(width-1),y,x+(width-1),y+(height-1),ColourWordGLCD(80,80,80));
-	PrintStringGLCD(text,x+(width>>1)-(GetStringWidthGLCD(text)>>1),y+(height>>1)-6,LCD_COLOR_BLACK);
+	PrintfGLCD(x+(width>>1)-(GetStringWidthGLCD(text,LCDFont7x11)>>1),y+(height>>1)-6,LCDFont7x11,LCD_COLOR_BLACK,ColourWordGLCD(128,128,128),text);
 }
 
 void DrawButtonPressedGLCD(unsigned short x, unsigned short y, unsigned short width, unsigned short height, char text[])
@@ -1614,7 +768,7 @@ void DrawButtonPressedGLCD(unsigned short x, unsigned short y, unsigned short wi
 	
 	LineGLCD(x,y+(height-1),x+(width-1),y+(height-1),ColourWordGLCD(80,80,80));
 	LineGLCD(x+(width-1),y,x+(width-1),y+(height-1),ColourWordGLCD(80,80,80));
-	PrintStringGLCD(text,x+(width>>1)-(GetStringWidthGLCD(text)>>1)+1,y+(height>>1)-6+1,LCD_COLOR_BLACK);
+	PrintfGLCD(x+(width>>1)-(GetStringWidthGLCD(text,LCDFont7x11)>>1)+1,y+(height>>1)-6+1,LCDFont7x11,LCD_COLOR_BLACK,ColourWordGLCD(128,128,128),text);
 }
 
 void DrawButtonsGLCD(struct ButtonType buttons[], unsigned int TotalButtons)
@@ -2366,43 +1520,204 @@ int RGB888OfRGB565(int c) {
 	return (r << 16) | (g << 8) | b;
 }
 
-unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, unsigned int colour)
+unsigned int BmpCharacter(char character, int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour)
 {
 	int x;
 	int y;
 	int bytenum;
-
-	if(font==LCDFontVariableWidth)
-	{
-		x=0;
-		for(bytenum=ascii2[character-' '];bytenum<(ascii2[character-' ']+ascii2[95+(character-' ')]);bytenum++)
-		{
-			for(y=0;y<8;y++)	//add byte
-			{
-				if(((ascii2[bytenum]>>y) & 1)==1){ SetPixelGLCD(x+x1,y+y1,colour); }
-			}
-			x+=1;
-		}
-	}
+	int nextx;
+	int prelineX;
 	
-	if(font==LCDFont7x11)
+	//background before the character
+	prelineX=x1-1;
+	if((BackColour>-1) && (prelineX>-1)){ LineGLCD(x1-1,y1,x1-1,y1+GetFontHeight(font)-1,BackColour); }
+
+	switch(font)
 	{
-		for(x=0;x<7;x++)
-		{
-			for(y=5;y<16;y++)
+		case LCDFontVariableWidth:
+			x=0;
+			for(bytenum=asciivbw[character-' '];bytenum<(asciivbw[character-' ']+asciivbw[95+(character-' ')]);bytenum++)
 			{
-				if((ascii_7x11[character-0x20][x]>>y) & 1)
+				for(y=0;y<8;y++)	//add byte
 				{
-					SetPixelGLCD(x+x1,y+y1-5,colour);
+					if(((asciivbw[bytenum]>>y) & 1)==1)
+					{
+						SetPixelGLCD(x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x+x1,y+y1,BackColour); }
+					}
+				}
+				x+=1;
+			}
+			break;
+			
+		case LCDFont7x11:
+			for(x=0;x<7;x++)
+			{
+				for(y=5;y<16;y++)
+				{
+					if((ascii_7x11[character-0x20][x]>>y) & 1)
+					{
+						SetPixelGLCD(x+x1,y+y1-5,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x+x1,y+y1-5,BackColour); }
+					}
 				}
 			}
-		}
+			break;
+			
+		case LCDFont8x8:
+			for(y=0;y<8;y++)
+			{
+				for(x=0;x<8;x++)
+				{
+					if(ascii_8x8[y+((character-' ')*8)] & (1<<(7-x)))
+					{
+						SetPixelGLCD(x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x+x1,y+y1,BackColour); }
+					}
+				}
+			}
+			break;
+			
+		case LCDFont8x12:
+			for(y=0;y<12;y++)
+			{
+				for(x=0;x<8;x++)
+				{
+					if(ascii_8x12[y+((character-' ')*12)] & (1<<(7-x)))
+					{
+						SetPixelGLCD(x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x+x1,y+y1,BackColour); }
+					}
+				}
+			}
+			break;
+			
+		case LCDFont12x12:
+			for(y=0;y<12;y++)
+			{
+				for(x=0;x<12;x++)
+				{
+					if(ascii_12x12[y+((character-' ')*12)] & (1<<(15-x)))
+					{
+						SetPixelGLCD(x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x+x1,y+y1,BackColour); }
+					}
+				}
+			}
+			break;
+			
+		case LCDFont16x24:
+			for(y=0;y<24;y++)
+			{
+				for(x=0;x<16;x++)
+				{
+					if(ascii_16x24[y+((character-' ')*24)] & (1<<x))
+					{
+						SetPixelGLCD(x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x+x1,y+y1,BackColour); }
+					}
+				}
+			}
+			break;
+			
+		case LCDFontHebrew:
+			x=0;
+			for(bytenum=hebrewfontvbw[character-1]+hebrewfontvbw[27+(character-1)]-1;bytenum>=hebrewfontvbw[character-1];bytenum--)
+			{
+				for(y=0;y<16;y++)	//add byte
+				{
+					if(((hebrewfontvbw[bytenum]>>y) & 1)==1)
+					{
+						SetPixelGLCD(x1-x,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ SetPixelGLCD(x1-x,y+y1,BackColour); }
+					}
+				}
+				x+=1;
+			}
+			break;
 	}
 	
-	return x1+x+1;
+	
+	if(font!=LCDFontHebrew)
+	{
+		nextx=x1+x+1;
+		if(BackColour>-1){ LineGLCD(x1+x,y1,x1+x,y1+GetFontHeight(font)-1,BackColour); }	//Colour inter letter gap
+	}else
+	{
+		nextx=x1-x-1;
+		if(BackColour>-1){ LineGLCD(x1-x,y1,x1-x,y1+GetFontHeight(font)-1,BackColour); }	//Colour inter letter gap
+	}
+	
+	return nextx;
 }
 
-unsigned short PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
+unsigned int GetStringWidthGLCD(char string[], unsigned int font)
+{
+	int x=0;
+	int i=0;
+
+	while(string[i]!=0)
+	{
+		x+=GetCharacterWidthGLCD(string[i], font)+1;
+		i+=1;
+	}
+	
+	return x-1;
+}
+
+unsigned int GetCharacterWidthGLCD(char chr, unsigned int font)
+{
+	unsigned int w=0;
+	
+	switch(font)
+	{
+		case LCDFontVariableWidth:
+			w=asciivbw[95+(chr-' ')];
+			break;
+			
+		case LCDFont7x11:
+			w=7;
+			break;
+			
+		case LCDFont8x8:
+			w=8;
+			break;
+			
+		case LCDFont8x12:
+			w=8;
+			break;
+			
+		case LCDFont12x12:
+			w=12;
+			break;
+			
+		case LCDFont16x24:
+			w=16;
+			break;
+			
+		case LCDFontHebrew:
+			w=hebrewfontvbw[27+(chr-1)];
+			break;
+	}
+	
+	return w;
+}
+
+unsigned short PrintfGLCD(int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour, const char * format, ... )
 {
 	char buff[256];
 	unsigned int i=0;
@@ -2414,7 +1729,7 @@ unsigned short PrintfGLCD(int x1, int y1, unsigned int font, unsigned int colour
   //print the string
 	do
 	{
-		x1=BmpCharacter(buff[i], x1, y1, font, colour);
+		x1=BmpCharacter(buff[i], x1, y1, font, TextColour, BackColour);
 		i+=1;
 	}while(buff[i]!=0);
 	

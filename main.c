@@ -27,18 +27,18 @@ int main(void)
 	// Draw a picture on the visible layer2 buffer
 	SetDrawBufferGraphics(GetLayer2BufferGraphics());
 	ClearGLCD(LCD_COLOR_BLACK);
-	PrintStringWithBGGLCD("                  Text!",0,0,1,LCD_COLOR_BLACK,LCD_COLOR_WHITE);
+	PrintfGLCD(0,0,LCDFont7x11,LCD_COLOR_BLACK,LCD_COLOR_WHITE,"                  Text!                  ");
 	CircleGLCD(159,119,100,LCD_COLOR_BLUE);
 	PrintValueSevSegGLCD(1234, 160-50+2+10, 120-5-13-30, 20, 3, 2, LCD_COLOR_YELLOW);
 	RectangleGLCD(160-50+2+14+5, 120-5-13-31, 160-50+2+10+58, 120-5-13-30+25, LCD_COLOR_RED);
-	PrintStringWithBGGLCD("Hello World!",160-50,120-5-13,0,LCD_COLOR_WHITE,LCD_COLOR_GREEN);
-	PrintStringGLCD("Hello World!",160-50,120-5,LCD_COLOR_WHITE);
-	PrintFloatGLCD(3.14159,5,160-50+20,120-5+14,LCD_COLOR_GREEN);
-	PrintString2GLCD("Hello World!",160-50+23,120-5+28,LCD_COLOR_WHITE);
-	PrintString2WithBGGLCD("Text!", 160-50+23+14, 120-5+28+10, 0, LCD_COLOR_BLUE,LCD_COLOR_RED);
+	PrintfGLCD(160-50,120-5-13,LCDFont7x11,LCD_COLOR_BLACK,LCD_COLOR_WHITE,"Hello World!");
+	PrintfGLCD(160-50,120-5,LCDFont7x11,LCD_COLOR_WHITE,-1,"Hello World!");
+	PrintfGLCD(160-50+20,120-5+14,LCDFont7x11,LCD_COLOR_GREEN,-1,"%.5f",3.14159);
+	PrintfGLCD(160-50+23,120-5+28,LCDFontVariableWidth,LCD_COLOR_WHITE,-1,"Hello World!");
+	PrintfGLCD(160-50+23+14,120-5+28+10,LCDFontVariableWidth,LCD_COLOR_BLUE,LCD_COLOR_RED,"Text!");
 	
 	// This is buggy now
-	AddButtonGLCD(buttons, &TotalButtons, 0, 15, GetStringWidthGLCD("blink")+8, 32, "blink");
+	AddButtonGLCD(buttons, &TotalButtons, 0, 15, GetStringWidthGLCD("blink",LCDFont7x11)+8, 32, "blink");
 	DrawButtonsGLCD(buttons, TotalButtons);
 
   // Set the draw address back to the layer1 backbuffer
