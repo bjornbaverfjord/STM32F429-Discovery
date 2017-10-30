@@ -1,5 +1,6 @@
 #include "main.h"
 #include "glcd.h"
+#include "hebletters.h"
 #include "registers.h"
 #include "STM32F4-lib.h"
 #include "InterruptPositions.h"
@@ -7,6 +8,7 @@
 #include "InterruptPositions.h"
 #include "HelperFunctions.h"
 #include "math.h"
+#include "Nx32_RGB_LED.h"	//uses timer14, LedMatrixWidth is defined here
 
 int main(void)
 {
@@ -14,7 +16,12 @@ int main(void)
 	unsigned int TotalButtons=0;
 	int PressedButton,x;
 	
+	//unsigned int bmp[64][32]={0};
+	
 	configSYSTICK(1000);	// 1 us timer resolution
+	
+	//InitRGBLEDMatrix();
+	//RGBLEDMatrixScrollText(bmp, "Hello World!    ", 63, 15-6, 10, LED8BITWHITE, LedFont7x11, DisplayMode8bit,LEDNoFlip);
 	
 	InitGLCD(landscape);
 	
