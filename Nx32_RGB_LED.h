@@ -90,8 +90,13 @@ PG2, PG3, PG13 (green led), PG14 (red led)
 #define DisplayMode8bit 4
 
 //fonts
-#define LedFontVariableWidth 0
-#define LedFont7x11 1
+#define LEDFontVariableWidth 0
+#define LEDFont7x11 1
+#define LEDFont8x8 2
+#define LEDFont8x12 3
+#define LEDFont12x12 4
+#define LEDFont16x24 5
+#define LEDFontHebrew 6
 
 //1 bit/channel colours
 #define LED1BITBLACK 0
@@ -183,21 +188,18 @@ void RGBLEDMatrixCircle(unsigned int bitmap[][32], int x0, int y0, int radius, u
 void RGBLEDMatrixCircleFilled(unsigned int bitmap[][32], int x0, int y0, int radius, unsigned int colour);
 
 //for functions using flipaxis, supply one of these: LEDNoFlip/LEDXFlip/LEDYFlip/LEDXYFlip
-unsigned int RGBLEDMatrixCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int colour, unsigned int font);	//font must be LedFontVariableWidth or LedFont7x11. returns the x position for the next character. 
-unsigned int RGBLEDMatrixGetCharacterLength(char character);
-void RGBLEDMatrixShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
-void RGBLEDMatrixShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
-void RGBLEDMatrixScrollText(unsigned int bitmap[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
-void RGBLEDMatrixScrollTextWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
-void RGBLEDMatrixScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
-void RGBLEDMatrixScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
-
-void RGBLEDMatrixShiftInCharacterHebrew(unsigned int bitmap[][32], char character, int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
-void RGBLEDMatrixScrollTextHebrew(unsigned int bitmap[][32], char characters[200], int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis);
+//font must be one of LEDFontVariableWidth, LEDFont7x11, LEDFont8x8, LEDFont8x12, LEDFont12x12, LEDFont16x24, LEDFontHebrew. 
+void printfRGBLEDMatrix(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour, const char * format, ... );
+void printfRGBLEDMatrixScrollText(unsigned int bitmap[][32], int x1, int y1, unsigned int fps, unsigned int TextColour, int BackColour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis, const char * format, ...);
+unsigned int RGBLEDMatrixCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour);	//returns the x position for the next character. 
+void RGBLEDMatrixShiftInCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int fps, unsigned int TextColour, int BackColour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis);
+unsigned int RGBLEDMatrixGetFontHeight(unsigned int font);
+unsigned int RGBLEDMatrixGetFontWidth(unsigned int font);
+unsigned int RGBLEDMatrixGetStringWidth(char string[], unsigned int font);
+unsigned int RGBLEDMatrixGetCharacterWidth(char chr, unsigned int font);
 
 void RGBLEDMatrixShiftInBitmap(const unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], unsigned int width, unsigned int height, int xRight, int yTop, unsigned int endgap, unsigned int fps, unsigned int DisplayMode, unsigned int flipAxis);
 
-void printfRGBLEDMatrix(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... );	//font must be LedFontVariableWidth or LedFont7x11
 
 void RGBLEDMatrixSevSegDigit(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int colour);
 unsigned int RGBLEDMatrixSevSegSegMultiDigits(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int ForceDigits, unsigned int colour);	//returns x position for next character. if ForceDigits= 0 or 1 then it will use as many digits as needed, 2 or more will left append 0s if needed

@@ -26,3 +26,4 @@
 #define HEB_resh 25
 #define HEB_shin 26
 #define HEB_tav 27
+#define HEB_space 28

@@ -1354,257 +1354,439 @@ void BmpRotate(unsigned int sourcebitmap[][32], unsigned int destbitmap[][32], d
 	}
 }
 
-unsigned int RGBLEDMatrixCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int colour, unsigned int font)
+unsigned int RGBLEDMatrixCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour)
 {
 	int x;
 	int y;
 	int bytenum;
-
-	if(font==LedFontVariableWidth)
-	{
-		x=0;
-		for(bytenum=asciivbw[character-' '];bytenum<(asciivbw[character-' ']+asciivbw[95+(character-' ')]);bytenum++)
-		{
-			for(y=0;y<8;y++)	//add byte
-			{
-				if(((asciivbw[bytenum]>>y) & 1)==1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,colour); }
-			}
-			x+=1;
-		}
-	}
+	int nextx;
+	int prelineX;
 	
-	if(font==LedFont7x11)
+	//background before the character
+	prelineX=x1-1;
+	if((BackColour>-1) && (prelineX>-1)){ RGBLEDMatrixLine(bitmap,x1-1,y1,x1-1,y1+RGBLEDMatrixGetFontHeight(font)-1,BackColour); }
+
+	switch(font)
 	{
-		for(x=0;x<7;x++)
-		{
-			for(y=5;y<16;y++)
+		case LEDFontVariableWidth:
+			x=0;
+			for(bytenum=asciivbw[character-' '];bytenum<(asciivbw[character-' ']+asciivbw[95+(character-' ')]);bytenum++)
 			{
-				if((ascii_7x11[character-0x20][x]>>y) & 1)
+				for(y=0;y<8;y++)	//add byte
 				{
-					RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1-5,colour);
+					if(((asciivbw[bytenum]>>y) & 1)==1)
+					{
+						RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,BackColour); }
+					}
+				}
+				x+=1;
+			}
+			break;
+			
+		case LEDFont7x11:
+			for(x=0;x<7;x++)
+			{
+				for(y=5;y<16;y++)
+				{
+					if((ascii_7x11[character-0x20][x]>>y) & 1)
+					{
+						RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1-5,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1-5,BackColour); }
+					}
 				}
 			}
-		}
-	}
-	
-	return x1+x+1;
-}
-
-unsigned int RGBLEDMatrixGetCharacterLength(char character)
-{
-	return asciivbw[95+(character-' ')];
-}
-
-void RGBLEDMatrixShiftInCharacter(unsigned int bitmap[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int x, y;
-	unsigned int bytenum, mS;
-	
-	mS=1000/fps;
-
-	if(font==LedFontVariableWidth)
-	{
-		for(bytenum=asciivbw[character-' '];bytenum<(asciivbw[character-' ']+asciivbw[95+(character-' ')]);bytenum++)
-		{
-			ResetTimer14();
-			for(y=0;y<8;y++)	//add byte
+			break;
+			
+		case LEDFont8x8:
+			for(y=0;y<8;y++)
 			{
-				if(((asciivbw[bytenum]>>y) & 1)==1){ RGBLEDMatrixSetPixel(bitmap,xRight,yTop+y,colour); }
-			}
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-			RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-			RGBLEDMatrixShiftLeft(bitmap,1);	//scroll
-		}
-	}
-	
-	if(font==LedFont7x11)
-	{
-		for(x=0;x<7;x++)
-		{
-			for(y=5;y<16;y++)
-			{
-				if((ascii_7x11[character-0x20][x]>>y) & 1)
+				for(x=0;x<8;x++)
 				{
-					RGBLEDMatrixSetPixel(bitmap,xRight,yTop+y-5,colour);
+					if(ascii_8x8[y+((character-' ')*8)] & (1<<(7-x)))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,BackColour); }
+					}
 				}
 			}
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-			RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-			RGBLEDMatrixShiftLeft(bitmap,1);	//scroll
-		}
-	}
-
-	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-	RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
-	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-	RGBLEDMatrixShiftLeft(bitmap,1);	//extra 1px space after the character
-}
-
-//0 to 26 character start index
-//27 to 53 words per character
-//54 to 204 words per character
-void RGBLEDMatrixShiftInCharacterHebrew(unsigned int bitmap[][32], char character, int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int y, mS, i;
-	int wordnum;
-	
-	mS=1000/fps;
-
-	if(character!=' ')
-	{
-		for(wordnum=hebrewfontvbw[character-1]+hebrewfontvbw[27+(character-1)]-1;wordnum>=hebrewfontvbw[character-1];wordnum--)
-		{
-			ResetTimer14();
-			for(y=0;y<16;y++)	//add word
+			break;
+			
+		case LEDFont8x12:
+			for(y=0;y<12;y++)
 			{
-				if(((hebrewfontvbw[wordnum]>>y) & 1)==1){ RGBLEDMatrixSetPixel(bitmap,xLeft,yTop+y,colour); }
+				for(x=0;x<8;x++)
+				{
+					if(ascii_8x12[y+((character-' ')*12)] & (1<<(7-x)))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,BackColour); }
+					}
+				}
 			}
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-			RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-			RGBLEDMatrixShiftRight(bitmap,1);	//scroll
-		}
+			break;
+			
+		case LEDFont12x12:
+			for(y=0;y<12;y++)
+			{
+				for(x=0;x<12;x++)
+				{
+					if(ascii_12x12[y+((character-' ')*12)] & (1<<(15-x)))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,BackColour); }
+					}
+				}
+			}
+			break;
+			
+		case LEDFont16x24:
+			for(y=0;y<24;y++)
+			{
+				for(x=0;x<16;x++)
+				{
+					if(ascii_16x24[y+((character-' ')*24)] & (1<<x))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x+x1,y+y1,BackColour); }
+					}
+				}
+			}
+			break;
+
+		case LEDFontHebrew:
+			x=0;
+			for(bytenum=hebrewfontvbw[character-1]+hebrewfontvbw[28+(character-1)]-1;bytenum>=hebrewfontvbw[character-1];bytenum--)
+			{
+				for(y=0;y<16;y++)	//add byte
+				{
+					if(((hebrewfontvbw[bytenum]>>y) & 1)==1)
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1-x,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1-x,y+y1,BackColour); }
+					}
+				}
+				x+=1;
+			}
+			break;
+	}
+	
+	
+	if(font!=LEDFontHebrew)
+	{
+		nextx=x1+x+1;
+		if(BackColour>-1){ RGBLEDMatrixLine(bitmap,x1+x,y1,x1+x,y1+RGBLEDMatrixGetFontHeight(font)-1,BackColour); }	//Colour inter letter gap
 	}else
 	{
-			for(i=0;i<5;i++)
+		nextx=x1-x-1;
+		if(BackColour>-1){ RGBLEDMatrixLine(bitmap,x1-x,y1,x1-x,y1+RGBLEDMatrixGetFontHeight(font)-1,BackColour); }	//Colour inter letter gap
+	}
+	
+	return nextx;
+}
+
+unsigned int RGBLEDMatrixGetFontHeight(unsigned int font)
+{
+	switch(font)
+	{
+		case LEDFontVariableWidth:
+			return 8;
+		case LEDFont7x11:
+			return 11;
+		case LEDFont8x8:
+			return 8;
+		case LEDFont8x12:
+			return 12;
+		case LEDFont12x12:
+			return 12;
+		case LEDFont16x24:
+			return 24;
+		case LEDFontHebrew:
+			return 16;
+	}
+	
+	return 0;
+}
+
+unsigned int RGBLEDMatrixGetFontWidth(unsigned int font)
+{
+	switch(font)
+	{
+		case LEDFontVariableWidth:
+			return 9;	//widest letter
+		case LEDFont7x11:
+			return 7;
+		case LEDFont8x8:
+			return 8;
+		case LEDFont8x12:
+			return 8;
+		case LEDFont12x12:
+			return 12;
+		case LEDFont16x24:
+			return 16;
+		case LEDFontHebrew:
+			return 8;	//widest letter
+	}
+
+	return 0;
+}
+
+void RGBLEDMatrixShiftInCharacter(unsigned int bitmap[][32], char character, int x1, int y1, unsigned int fps, unsigned int TextColour, int BackColour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
+{
+	int x;
+	int y;
+	int bytenum;
+	unsigned int mS;
+	
+	mS=1000/fps;
+
+	switch(font)
+	{
+		case LEDFontVariableWidth:
+			for(bytenum=asciivbw[character-' '];bytenum<(asciivbw[character-' ']+asciivbw[95+(character-' ')]);bytenum++)
 			{
-				ResetTimer14();
+				for(y=0;y<8;y++)	//add byte
+				{
+					if(((asciivbw[bytenum]>>y) & 1)==1)
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1,BackColour); }
+					}
+				}
+				
 				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
 				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
 				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-				RGBLEDMatrixShiftRight(bitmap,1);	//scroll
+				RGBLEDMatrixShiftLeft(bitmap,1);
 			}
+			break;
+			
+		case LEDFont7x11:
+			for(x=0;x<7;x++)
+			{
+				for(y=5;y<16;y++)
+				{
+					if((ascii_7x11[character-0x20][x]>>y) & 1)
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1-5,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1-5,BackColour); }
+					}
+				}
+				
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
+				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
+				RGBLEDMatrixShiftLeft(bitmap,1);
+			}
+			break;
+		
+		case LEDFont8x8:
+			for(x=0;x<8;x++)
+			{
+				for(y=0;y<8;y++)
+				{
+					if(ascii_8x8[y+((character-' ')*8)] & (1<<(7-x)))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1,BackColour); }
+					}
+				}
+				
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
+				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
+				RGBLEDMatrixShiftLeft(bitmap,1);
+			}
+			break;
+			
+		case LEDFont8x12:
+			for(x=0;x<8;x++)
+			{
+				for(y=0;y<12;y++)
+				{
+					if(ascii_8x12[y+((character-' ')*12)] & (1<<(7-x)))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1,BackColour); }
+					}
+				}
+				
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
+				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
+				RGBLEDMatrixShiftLeft(bitmap,1);
+			}
+			break;
+			
+		case LEDFont12x12:
+			for(x=0;x<12;x++)
+			{
+				for(y=0;y<12;y++)
+				{
+					if(ascii_12x12[y+((character-' ')*12)] & (1<<(15-x)))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1,BackColour); }
+					}
+				}
+				
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
+				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
+				RGBLEDMatrixShiftLeft(bitmap,1);
+			}
+			break;
+			
+		case LEDFont16x24:
+			for(x=0;x<16;x++)
+			{
+				for(y=0;y<24;y++)
+				{
+					if(ascii_16x24[y+((character-' ')*24)] & (1<<x))
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1,BackColour); }
+					}
+				}
+
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
+				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
+				RGBLEDMatrixShiftLeft(bitmap,1);
+			}
+			break;
+			
+		case LEDFontHebrew:
+			for(bytenum=hebrewfontvbw[character-1]+hebrewfontvbw[28+(character-1)]-1;bytenum>=hebrewfontvbw[character-1];bytenum--)
+			{
+				for(y=0;y<16;y++)	//add word
+				{
+					if(((hebrewfontvbw[bytenum]>>y) & 1)==1)
+					{
+						RGBLEDMatrixSetPixel(bitmap,x1,y+y1,TextColour);
+					}else
+					{
+						if(BackColour>-1){ RGBLEDMatrixSetPixel(bitmap,x1,y+y1,BackColour); }
+					}
+				}
+
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
+				RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
+				if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
+				RGBLEDMatrixShiftRight(bitmap,1);
+			}
+			break;
 	}
+	
+	if(BackColour>-1){ RGBLEDMatrixLine(bitmap,x1,y1,x1,y1+RGBLEDMatrixGetFontHeight(font)-1,BackColour); }	//Colour inter letter gap
 
 	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
 	RGBLEDMatrixDisplayBitmapDuration(bitmap, mS, DisplayMode);		//display frame
-	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-	RGBLEDMatrixShiftRight(bitmap,1);	//extra 1px space after the character
+	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip	
+	
+	if(font!=LEDFontHebrew)	//extra 1px space after the character
+	{
+		RGBLEDMatrixShiftLeft(bitmap,1);
+	}else
+	{
+		RGBLEDMatrixShiftRight(bitmap,1);
+	}
+
+
 }
 
-void RGBLEDMatrixShiftInCharacterWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char character, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
+void printfRGBLEDMatrixScrollText(unsigned int bitmap[][32], int x1, int y1, unsigned int fps, unsigned int TextColour, int BackColour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis, const char * format, ...)
 {
-	unsigned int x, y;
-	unsigned int bytenum, mS;
-	unsigned int outputbitmap[32][32];
+	char characters[256];
+	unsigned int i=0;
+	va_list args;
 	
-	mS=1000/fps;
+	va_start(args,format);
+	vsnprintf(characters,256,format,args);
 
-	if(font==LedFontVariableWidth)
+	while(characters[i]!=0)
 	{
-		for(bytenum=asciivbw[character-' '];bytenum<(asciivbw[character-' ']+asciivbw[95+(character-' ')]);bytenum++)
-		{
-			ResetTimer14();
-			for(y=0;y<8;y++)	//add byte
-			{
-				if(((asciivbw[bytenum]>>y) & 1)==1){ RGBLEDMatrixSetPixel(bitmap,xRight,yTop+y,colour); }
-			}
+		RGBLEDMatrixShiftInCharacter(bitmap, characters[i], x1, y1, fps, TextColour, BackColour, font, DisplayMode, flipAxis);
+		i++;
+	}
+}
+
+unsigned int RGBLEDMatrixGetStringWidth(char string[], unsigned int font)
+{
+	int x=0;
+	int i=0;
+
+	while(string[i]!=0)
+	{
+		x+=RGBLEDMatrixGetCharacterWidth(string[i], font)+1;
+		i+=1;
+	}
+	
+	return x-1;
+}
+
+unsigned int RGBLEDMatrixGetCharacterWidth(char chr, unsigned int font)
+{
+	unsigned int w=0;
+	
+	switch(font)
+	{
+		case LEDFontVariableWidth:
+			w=asciivbw[95+(chr-' ')];
+			break;
 			
-			RGBLEDMatrixReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-			RGBLEDMatrixDisplayBitmapDuration(outputbitmap, mS, DisplayMode);		//display frame
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-			RGBLEDMatrixShiftLeft(bitmap,1);	//scroll
-		}
+		case LEDFont7x11:
+			w=7;
+			break;
+			
+		case LEDFont8x8:
+			w=8;
+			break;
+			
+		case LEDFont8x12:
+			w=8;
+			break;
+			
+		case LEDFont12x12:
+			w=12;
+			break;
+			
+		case LEDFont16x24:
+			w=16;
+			break;
+			
+		case LEDFontHebrew:
+			w=hebrewfontvbw[27+(chr-1)];
+			break;
 	}
 	
-	if(font==LedFont7x11)
-	{
-		for(x=0;x<7;x++)
-		{
-			for(y=5;y<16;y++)
-			{
-				if((ascii_7x11[character-0x20][x]>>y) & 1)
-				{
-					RGBLEDMatrixSetPixel(bitmap,xRight,yTop+y-5,colour);
-				}
-			}
-			RGBLEDMatrixReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-			RGBLEDMatrixDisplayBitmapDuration(outputbitmap, mS, DisplayMode);		//display frame
-			if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-			RGBLEDMatrixShiftLeft(bitmap,1);	//scroll
-		}
-	}
-
-	RGBLEDMatrixReplaceColourWithBmpIntoBmp(bitmap,0,bitmapBG,outputbitmap);
-	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//flip
-	RGBLEDMatrixDisplayBitmapDuration(outputbitmap, mS, DisplayMode);		//display frame
-	if(flipAxis!=LEDNoFlip){ RGBLEDMatrixFlip(bitmap,flipAxis); }	//unflip
-	RGBLEDMatrixShiftLeft(bitmap,1);	//extra 1px space after the character
-}
-
-void RGBLEDMatrixScrollText(unsigned int bitmap[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int i=0;
-
-	while(characters[i]!=0)
-	{
-		RGBLEDMatrixShiftInCharacter(bitmap, characters[i], xRight, yTop, fps, colour, font, DisplayMode, flipAxis);
-		i++;
-	}
-}
-
-void RGBLEDMatrixScrollTextHebrew(unsigned int bitmap[][32], char characters[200], int xLeft, int yTop, unsigned int fps, unsigned int colour, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int i=0;
-
-	while(characters[i]!=0)
-	{
-		RGBLEDMatrixShiftInCharacterHebrew(bitmap, characters[i], xLeft, yTop, fps, colour, DisplayMode, flipAxis);
-		i++;
-	}
-}
-
-void RGBLEDMatrixScrollTextWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], char characters[200], int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int i=0;
-
-	while(characters[i]!=0)
-	{
-		RGBLEDMatrixShiftInCharacterWithBG(bitmap, bitmapBG, characters[i], xRight, yTop, fps, colour, font, DisplayMode, flipAxis);
-		i++;
-	}
-}
-
-void RGBLEDMatrixScrollValue(unsigned int bitmap[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	unit=1000000000;
-	print=0;
-	for(digit=10;digit>=1;digit--)
-	{
-		digitval=val/unit;
-		val -= digitval*unit;
-		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ RGBLEDMatrixShiftInCharacter(bitmap, digitval+'0', xRight, yTop, fps, colour, font, DisplayMode, flipAxis); }
-		unit /= 10;
-	}
-}
-
-void RGBLEDMatrixScrollValueWithBG(unsigned int bitmap[][32], unsigned int bitmapBG[][32], unsigned int val, int xRight, int yTop, unsigned int fps, unsigned int colour, unsigned int font, unsigned int DisplayMode, unsigned int flipAxis)
-{
-	unsigned int unit;
-	unsigned int digit;
-	unsigned int digitval;
-	unsigned int print;
-
-	unit=1000000000;
-	print=0;
-	for(digit=10;digit>=1;digit--)
-	{
-		digitval=val/unit;
-		val -= digitval*unit;
-		if((digitval>0) || (digit==1)){ print=1; }
-		if(print==1){ RGBLEDMatrixShiftInCharacterWithBG(bitmap, bitmapBG, digitval+'0', xRight, yTop, fps, colour, font, DisplayMode, flipAxis); }
-		unit /= 10;
-	}
+	return w;
 }
 
 void RGBLEDMatrixSevSegDigit(unsigned int bitmap[][32], unsigned int val, int xLeft, int yTop, unsigned int colour)
@@ -1984,7 +2166,7 @@ unsigned int RGBLEDMatrixPrintValue2DigitsSevSegLarge(unsigned int bitmap[][32],
 	return xpos;
 }
 
-void printfRGBLEDMatrix(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int colour, const char * format, ... )
+void printfRGBLEDMatrix(unsigned int bitmap[][32], int x1, int y1, unsigned int font, unsigned int TextColour, int BackColour, const char * format, ... )
 {
 	char buff[256];
 	unsigned int i=0;
@@ -1996,7 +2178,7 @@ void printfRGBLEDMatrix(unsigned int bitmap[][32], int x1, int y1, unsigned int 
   //print the string
 	do
 	{
-		x1=RGBLEDMatrixCharacter(bitmap, buff[i], x1, y1, colour, font);
+		x1=RGBLEDMatrixCharacter(bitmap, buff[i], x1, y1, font, TextColour, BackColour);
 		i+=1;
 	}while(buff[i]!=0);
 	
