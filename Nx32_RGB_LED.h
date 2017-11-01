@@ -107,6 +107,7 @@ PG2, PG3, PG13 (green led), PG14 (red led)
 #define LED1BITCYAN 3
 #define LED1BITPURPLE 5
 #define LED1BITWHITE 7
+#define LED1BITTRANSPARENT -1
 
 //4 bit/channel colours
 #define LED4BITBLACK 0x000
@@ -118,6 +119,7 @@ PG2, PG3, PG13 (green led), PG14 (red led)
 #define LED4BITPURPLE 0xF0F
 #define LED4BITWHITE 0xFFF
 #define LED4BITORANGE 0xF70
+#define LED4BITTRANSPARENT -1
 
 //8 bit/channel colours
 #define LED8BITBLACK 0x000000
@@ -129,6 +131,7 @@ PG2, PG3, PG13 (green led), PG14 (red led)
 #define LED8BITPURPLE 0xFF00FF
 #define LED8BITWHITE 0xFFFFFF
 #define LED8BITORANGE 0xFF7F00
+#define LED8BITTRANSPARENT -1
 
 #define LEDNoFlip 0
 #define LEDXFlip 1
